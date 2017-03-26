@@ -19,7 +19,7 @@ from AIML_module import Responder
 from Module_Manager import *
 from User_Manager import *
 from tempfile_ import *
-
+from DataTypes.LongPoolUpdate import *
 HDR = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -92,11 +92,11 @@ class Bot:
         self.Checkqueue = queue.Queue()
         self.Replyqueue = queue.Queue()
         self.LP_threads = []
-        for i in range(LP_Threads):
-            self.LP_threads.append(threading.Thread(target=self.parseLongPool))
-            self.LP_threads[i].setDaemon(True)
-            self.LP_threads[i].start()
-            print('LongPool thread №{} started'.format(i))
+        #for i in range(LP_Threads):
+        #    self.LP_threads.append(threading.Thread(target=self.parseLongPool))
+        #    self.LP_threads[i].setDaemon(True)
+        #    self.LP_threads[i].start()
+        #    print('LongPool thread №{} started'.format(i))
         self.EX_threadList = []
         for i in range(threads):
             self.EX_threadList.append(threading.Thread(target=self.ExecCommands))
@@ -104,7 +104,7 @@ class Bot:
             self.EX_threadList[i].start()
             print('Exec thread №{} started'.format(i))
         self.USERS = UserManager()
-        self.MODULES = ModuleManager()
+        #self.MODULES = ModuleManager()
         self.DEBUG = DEBUG
         self.TRIGGERS = trigger.TriggerHandler()
         self.AdminModeOnly = False
@@ -355,17 +355,7 @@ class Bot:
             return 'doc{}_{}'.format(doc['owner_id'], doc['id']), doc
         return None, None
 
-    def LongPool(self, key, server, ts):
 
-        url = 'https://' + server + '?act=a_check&key=' + key + '&ts=' + str(ts) + '&wait=25&mode=2&version=1'
-        try:
-
-            request = requests.get(url)
-            result = request.json()
-
-        except ValueError:
-            result = '{ failed: 2}'
-        return result
 
     def ExecCommands(self):
 
@@ -571,31 +561,7 @@ class Bot:
                     self.Replyqueue.put(defargs)
 
 
-    def ContiniousMessageCheck(self, server=''):
-        while True:
-            if (server == ''):
-                results = self.UserApi.messages.getLongPollServer()
-                key = results['key']
-                server = results['server']
-                ts = results['ts']
-            results = self.LongPool(key, server, ts)
-            try:
-                ts = results['ts']
-            except (KeyError, TypeError):
-                key = ''
-                server = ''
-                ts = ''
-                sleep(0.001)
-                continue
-            try:
-                updates = results['updates']
-            except (KeyError, TypeError):
-                key = ''
-                server = ''
-                ts = ''
-                sleep(0.001)
-                continue
-            self.Longpool.put(results)
+
 
     def SourceAct(self, type, data, MSData):
         print('Что то с Актом пришло')
@@ -709,126 +675,52 @@ class Bot:
         sizesSorted = sorted(sizesToSort, reverse=True)[0]
         size = data[sizesToSort[sizesSorted]]
         return data[sizesToSort[sizesSorted]]
-
-    def parseLongPool(self):
-
+    def ContiniousMessageCheck(self,server = ""):
         while True:
-            results = self.Longpool.get()
+            if (server == ''):
+                results = self.UserApi.messages.getLongPollServer()
+                server = results['server']
+                key = results['key']
+                ts = results['ts']
+                print(ts)
+            url = 'https://{}?act=a_check&key={}&ts={}&wait=25&mode=2&version=1'
             try:
-                updates = results['updates']
-            except (KeyError, TypeError):
-                key = ''
-                server = ''
-                ts = ''
-                sleep(0.001)
+                req = requests.request('GET',url.format(server,key,ts)).json()
+
+            except Exception:
+                print('TIMEOUT ERROR, reconnecting in 5 seconds')
+                sleep(5)
+                server = ""
+                ts = ""
+                key = ""
                 continue
-            try:
-                updates = results['updates']
-            except (KeyError, TypeError):
-                key = ''
-                server = ''
-                ts = ''
-                sleep(0.001)
-                continue
-            if updates:
-                for update in updates:
-                    s = update
+            if len(req['updates'])>0:
+                hasMsg = False
+                for upd in req['updates']:
+                    if 4 == upd[0]:
+                        hasMsg = True
+                if hasMsg:
+                    self.parseLongPoolHistory(ts)
+                    print(ts,req['ts'])
+                    ts = req['ts']
 
-                    try:
-                        code = s[0]
-                    except KeyError:
-                        continue
-                    if code == 4:
-                        try:
-                            args = {}
-                            message_id = s[1]
-                            flags = s[2]
-                            from_id = s[3]
-                            timestamp = s[4]
-                            subject = s[5]
-                            text = s[6]
-                            atts = s[7]
 
-                            attatchments = []
+    def parseLongPoolHistory(self,ts):
+        print(ts)
+        resp = self.UserApi.messages.getLongPollHistory(ts = ts,v='5.63',fields = 'photo,photo_medium_rec,sex,online,screen_name',)
+        try:
+            updates = FillUpdates(resp)
+        except:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            TB = traceback.format_tb(exc_traceback)
+            print('except',resp)
+            print_(exc_type)
+            print_(exc_value)
+            print_('\n','\n'.join(TB))
+        print(str(updates.messages[0]))
+        return
 
-                            attsFindAll = re.findall(r'attach\d+_type', str(atts))
-                            for att in attsFindAll:
 
-                                if atts[att] == 'photo':
-                                    attatchments.append(atts[att.split('_')[0]])
-                            args['attachments'] = attatchments
-                            args['peer_id'] = from_id
-                            args["message"] = text
-                            args['message_id'] = message_id
-                            args['date'] = timestamp
-                            args['user_id'] = self.GetUserFromMessage(message_id)
-                            args['atts'] = atts
-                            args['subject'] = subject
-                            args['v'] = 5.45
-                            if 'source_act' in atts:
-                                print(atts)
-                                self.SourceAct(atts['source_act'], atts, args)
-                            if args['user_id'] != self.MyUId:
-                                self.Checkqueue.put(args, timeout=60)
-                                # self.CheckForCommands(args)
-                                # self.Reply(self.UserApi,args)
-                                # return from_id,text,subject
-                        except Exception as  A:
-                            exc_type, exc_value, exc_traceback = sys.exc_info()
-                            TB = traceback.format_tb(exc_traceback)
-                            print(exc_type, exc_value, ''.join(TB), )
-
-                            # elif code == 8:
-                            #    try:
-                            #        user = self.GetUserNameById(s[1] * -1)
-                            #        try:
-                            #            if user['sex'] == 2:
-                            #                sex = 'Вошел'
-                            #            elif user['sex'] == 1:
-                            #                sex = 'Вошла'
-                            #        except:
-                            #            sex = 'Вошло'
-                            #        toprint = " ".join([user['first_name'], user['last_name'], ' {} в сеть'.format(sex)])
-                            #    except KeyError:
-                            #        continue
-                            # elif code == 9:
-                            #    try:
-                            #        user = self.GetUserNameById(s[1] * -1)
-                            #        try:
-                            #            if user['sex'] == 2:
-                            #                sex = 'Вышел'
-                            #            elif user['sex'] == 1:
-                            #                sex = 'Вышла'
-                            #            else:
-                            #                sex = "Вышло"
-                            #        except:
-                            #            sex = 'Вышло'
-                            #        try:
-                            #            toprint = " ".join([user['first_name'], user['last_name'], ' {} из сети'.format(sex)])
-                            #        except:
-                            #            pass
-                            #    except KeyError:
-                            #        continue
-                            # elif code == 61:
-                            #    try:
-                            #        user = self.GetUserNameById(s[1])
-                            #        toprint = " ".join([user['first_name'], user['last_name'], 'Набирает сообщение'])
-                            #    except:
-                            #        continue
-                            # elif code == 62:
-                            #    user = self.GetUserNameById(s[1])
-                            #    arg = {}
-                            #    arg['chat_id'] = s[2]
-                            #    try:
-                            #        chat = self.UserApi.messages.getChat(**arg)
-                            #    except:
-                            #        chat = {}
-                            #        chat['title'] = 'Хз чё, но тута ошибка'
-                            #    try:
-                            #        toprint = " ".join(
-                            #            [user['first_name'], user['last_name'], 'Набирает сообщение в беседе', chat['title']])
-                            #    except:
-                            #        continue
 
 
 if __name__ == "__main__":
