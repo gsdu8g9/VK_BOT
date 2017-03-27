@@ -2,9 +2,8 @@ import os
 import urllib
 from urllib.request import urlopen
 
-from PIL_module import Wanted, JonTron, SayMax, textPlain
-
-from tempfile_ import TempFile
+from libs.PIL_module import Wanted, JonTron, SayMax, textPlain
+from libs.tempfile_ import TempFile
 
 HDR = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',

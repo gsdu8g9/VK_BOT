@@ -5,6 +5,7 @@ from urllib.request import urlopen
 
 from DataTypes.LongPoolUpdate import Attachment
 from trigger import Trigger
+
 try:
 
     from PIL import ImageGrab
@@ -14,11 +15,10 @@ except:
     windows = False
     ImageGrab = None
 
-import EveryPixel
-import e621_Api as e6
-from GlitchLib import Merge
-from PIL_module import kok, kek, roll, rollsmast, add, resize_, Glitch2
-from tempfile_ import TempFile
+from libs import e621_Api as e6, EveryPixel
+from libs.GlitchLib import Merge
+from libs.PIL_module import kok, kek, roll, rollsmast, add, resize_, Glitch2
+from libs.tempfile_ import TempFile
 
 HDR = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',

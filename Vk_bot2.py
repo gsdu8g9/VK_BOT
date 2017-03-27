@@ -3,23 +3,25 @@ import queue
 import re
 import threading
 import tkinter as tk
-import traceback
 import urllib
 from math import *
 from random import choice
 from time import sleep
 from tkinter import ttk
 from urllib.request import urlopen
-import trigger
+
 import requests
+import vk.exceptions as VKEX
 from PIL import Image, ImageTk
 from vk import *
-from AIML_module import Responder
+
+import trigger
+from DataTypes.LongPoolUpdate import *
 from Module_Manager import *
 from User_Manager import *
-from tempfile_ import *
-from DataTypes.LongPoolUpdate import *
-import vk.exceptions as VKEX
+from libs.AIML_module import Responder
+from libs.tempfile_ import *
+
 HDR = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',

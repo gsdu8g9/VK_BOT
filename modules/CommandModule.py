@@ -1,19 +1,14 @@
-import copy
 import json
 import os
 import random
-import re
 import sys
 import tempfile as tempF
-import traceback
 import urllib
 from datetime import datetime, timedelta
 from html.parser import HTMLParser
 from math import log
 from time import sleep
 from urllib.request import urlopen
-
-from DataTypes.LongPoolUpdate import Attachment
 
 try:
     import execjs
@@ -37,8 +32,8 @@ except:
     gttsAvalable = False
 import pymorphy2
 import requests
-import VK_foaf
-from tempfile_ import TempFile
+from libs import VK_foaf
+from libs.tempfile_ import TempFile
 
 try:
     from .__Command_template import *

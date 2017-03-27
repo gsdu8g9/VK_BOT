@@ -4,7 +4,6 @@ import json
 import queue
 import re
 import subprocess
-import sys
 import threading
 import tkinter as tk
 import traceback
@@ -19,15 +18,14 @@ import requests
 from PIL import ImageTk
 from vk import *
 
-import DA_Api as D_A
-import Vk_bot_RssModule
-import YT_Api as YT_
-import e621_Api as e6
-from GlitchLib import *
-from Mimimi_Api import *
-from PIL_module import *
-from filters import *
-from tempfile_ import *
+import libs.YT_Api as YT_
+import libs.e621_Api as e6
+from libs import DA_Api as D_A, Vk_bot_RssModule
+from libs.GlitchLib import *
+from libs.Mimimi_Api import *
+from libs.PIL_module import *
+from libs.filters import *
+from libs.tempfile_ import *
 
 
 def getpath():
