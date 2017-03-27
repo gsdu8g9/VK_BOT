@@ -27,11 +27,9 @@ class Command_WantedFunk(C_template):
     perm = 'photo.wanted'
     cost = 5
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        atts = data['attachments']
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
+        atts = data.attachments
         # print(atts)
         Topost = []
         if len(atts) != 2:
@@ -40,11 +38,11 @@ class Command_WantedFunk(C_template):
             return False
         try:
 
-            photo = bot.GetBiggesPic(atts[0], data['message_id'])
+            photo = atts[0].photo.photo
         except:
             return False
         try:
-            photo1 = bot.GetBiggesPic(atts[1], data['message_id'])
+            photo1 = atts[1].photo.photo
         except:
             return False
         req = urllib.request.Request(photo, headers=HDR)
@@ -69,17 +67,15 @@ class Command_JonTronFunk(C_template):
     perm = 'photo.jontron'
     cost = 5
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        atts = data['attachments']
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
+        atts = data.attachments
         # print(atts)
         Topost = []
 
         try:
 
-            photo = bot.GetBiggesPic(atts[0], data['message_id'])
+            photo = atts[0].photo.photo
             req = urllib.request.Request(photo, headers=HDR)
 
             img = urlopen(req).read()
@@ -90,11 +86,11 @@ class Command_JonTronFunk(C_template):
 
             Tmp.rem()
         except:
-            text = data["custom"]['text'] if 'text' in data["custom"] else 'Meh...'
-            size = data["custom"]['size'] if 'size' in data["custom"] else 120
-            font = data["custom"]['font'] if 'font' in data["custom"] else 'times.ttf'
-            x = int(data["custom"]['x']) if 'x' in data["custom"] else 100
-            y = int(data["custom"]['y']) if 'y' in data["custom"] else 150
+            text = data.custom['text'] if 'text' in data.custom else 'Meh...'
+            size = data.custom['size'] if 'size' in data.custom else 120
+            font = data.custom['font'] if 'font' in data.custom else 'times.ttf'
+            x = int(data.custom['x']) if 'x' in data.custom else 100
+            y = int(data.custom['y']) if 'y' in data.custom else 150
             if text == None:
                 return False
             _path = textPlain(text, size, font, x, y, 512, 512)
@@ -115,17 +111,15 @@ class Command_SayMaxFunk(C_template):
     perm = 'photo.saymax'
     cost = 5
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        atts = data['attachments']
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
+        atts = data.attachments
         # print(atts)
         Topost = []
 
         try:
 
-            photo = bot.GetBiggesPic(atts[0], data['message_id'])
+            photo = atts[0].photo.photo
             req = urllib.request.Request(photo, headers=HDR)
 
             img = urlopen(req).read()
@@ -136,11 +130,11 @@ class Command_SayMaxFunk(C_template):
             att = bot.UploadFromDisk(Tmp.path_)
             Tmp.rem()
         except:
-            text = data["custom"]['text'] if 'text' in data["custom"] else 'кок'
-            size = data["custom"]['size'] if 'size' in data["custom"] else 300
-            font = data["custom"]['font'] if 'font' in data["custom"] else 'times.ttf'
-            x = int(data["custom"]['x']) if 'x' in args else 250
-            y = int(data["custom"]['y']) if 'y' in args else 200
+            text = data.custom['text'] if 'text' in data.custom else 'кок'
+            size = data.custom['size'] if 'size' in data.custom else 300
+            font = data.custom['font'] if 'font' in data.custom else 'times.ttf'
+            x = int(data.custom['x']) if 'x' in args else 250
+            y = int(data.custom['y']) if 'y' in args else 200
             if text == None:
                 return False
             _path = textPlain(text, size, font, x, y, 1280, 720)

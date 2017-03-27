@@ -14,14 +14,15 @@ class Command_AddCurrency(C_template):
     desc = 'Редактирование кошелька пользователя'
     template = '{botname}, id пользователя кол-во денег'
     @staticmethod
-    def execute(bot, data, forward=True):
-        text = data['text'].split(' ')
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
+        if forward:
+            args.update({"forward_messages": data.id})
+        text = data.text.split(' ')
         user = text[0]
         curr = text[-1]
         bot.USERS.UpdateCuttency(user, curr)
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
+        args = {"peer_id": data.chat_id, "v": "5.60", }
 
         userName = bot.GetUserNameById(user)
         try:
@@ -42,14 +43,17 @@ class Command_SetCurrency(C_template):
     desc = 'Редактирование кошелька пользователя'
     template = '{botname}, id пользователя кол-во денег'
     @staticmethod
-    def execute(bot, data, forward=True):
-        text = data['text'].split(' ')
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
+        if forward:
+            args.update({"forward_messages": data.id})
+        text = data.text.split(' ')
         user = text[0]
         curr = text[-1]
         bot.USERS.SetCurrency(user, curr)
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
+            args.update({"forward_messages": data.id})
 
         userName = bot.GetUserNameById(user)
         try:
@@ -67,11 +71,11 @@ class Command_GiveCurr(C_template):
     desc = 'Позволяет передать валюту'
     template = '{}, id пользователя кол-во денег'
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
-        text = data['text'].split(' ')
+            args.update({"forward_messages": data.id})
+        text = data.text.split(' ')
         user = text[0]
         curr = text[-1]
         if not bot.USERS.isValid(user):
@@ -81,7 +85,7 @@ class Command_GiveCurr(C_template):
         #from
         bot.USERS.pay(str(user), -int(curr))
         #to
-        bot.USERS.pay(str(data['user_id']), int(curr))
+        bot.USERS.pay(str(data.user_id), int(curr))
         userName = bot.GetUserNameById(user)
         try:
             args['message'] = 'Вы перевели {} {} {} валюты'.format(userName['first_name'], userName['last_name'], curr)

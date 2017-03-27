@@ -1,26 +1,19 @@
 import copy
-import importlib
 import json
 import os
 import random
 import re
 import sys
 import tempfile as tempF
-import threading
 import traceback
-import types
 import urllib
 from datetime import datetime, timedelta
 from html.parser import HTMLParser
 from math import log
 from time import sleep
 from urllib.request import urlopen
-import logging
 
-import psutil
-
-
-
+from DataTypes.LongPoolUpdate import Attachment
 
 try:
     import execjs
@@ -38,24 +31,20 @@ except:
     feedparserAvalible = False
 try:
     import gtts
-
     gttsAvalable = True
 except:
     gtts = None
     gttsAvalable = False
 import pymorphy2
 import requests
-from vk import API
-
 import VK_foaf
-from Vk_bot2 import SessionCapchaFix
 from tempfile_ import TempFile
-
 
 try:
     from .__Command_template import *
 except:
     from __Command_template import *
+
 morph = pymorphy2.MorphAnalyzer()
 HDR = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
@@ -81,24 +70,23 @@ class Command_Whom(C_template):
     desc = "Выбирает случайного человека"
     perm = 'text.whom'
     cost = 2
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
-        text = " ".join(data['message'].split(',')[1].split(' ')[2:]) if "?" not in data['message'] else " ".join(
-            data['message'].split(',')[1].split(' ')[2:])[:-1]
-        if int(data['peer_id']) <= 2000000000:
+            args.update({"forward_messages": data.id})
+        text = " ".join(data.body.split(',')[1].split(' ')[2:]) if "?" not in data.body else " ".join(
+            data.body.split(',')[1].split(' ')[2:])[:-1]
+        if int(data.id) <= 2000000000:
             args['message'] = "Тебя"
             return args
         else:
-            chat = int(data['peer_id']) - 2000000000
-            users = bot.UserApi.messages.getChatUsers(chat_id=chat, fields='nickname', v=5.38,
-                                                      name_case='acc')
+            users = data.chat_active
             toinf = text.split(" ")
             toins = ""
             user = random.choice(users)
-            ud = bot.GetUserNameById(user['id'])['sex']
+            ud = LongPoolUpdates.GetUserProfile(user).sex
             if ud == 2:
                 userGender = "masc"
             elif ud == 1:
@@ -127,7 +115,7 @@ class Command_Whom(C_template):
             if user['id'] == bot.MyUId:
                 args['message'] = 'Определённо меня'
                 bot.Replyqueue.put(args)
-            name = '*id{} ({} {})'.format(str(user['id']),user['first_name'], user['last_name'])
+            name = '*id{} ({} {})'.format(str(user['id']), user['first_name'], user['last_name'])
             replies = ["Определённо {}", "Точно {}", "Я уверен что его -  {}"]
             msg = random.choice(replies)
             args['message'] = msg.format(name)
@@ -141,28 +129,37 @@ class Command_Who(C_template):
     desc = "Выбирает случайного человека"
     perm = 'text.who'
     cost = 2
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True) -> bool:
+        """
+
+        Args:
+            forward (bool):
+            Updates (Updates):
+            data (LongPoolMessage):
+            bot (Vk_bot2.bot):
+        """
+
+        args = {"peer_id": data.chat_id, "v": "5.60", }
+
         if forward:
-            args.update({"forward_messages": data['message_id']})
+            args.update({"forward_messages": data.id})
         text = " ".join(
-            data['message'].split(',')[1].split(' ')[2:])[:-1] if data['message'].endswith("?") else " ".join(
-            data['message'].split(',')[1].split(' ')[2:])
+            data.body.split(',')[1].split(' ')[2:])[:-1] if data.body.endswith("?") else " ".join(
+            data.body.split(',')[1].split(' ')[2:])
         if "мне" in text: text = text.replace('мне', 'тебе')
         if "мной" in text: text = text.replace('мной', 'тобой')
         if "моей" in text: text = text.replace('моей', 'твоей')
-        if int(data['peer_id']) <= 2000000000:
+        if not data.isChat:
             args['message'] = "Ты"
             bot.Replyqueue.put(args)
             return True
         else:
-            chat = int(data['peer_id']) - 2000000000
-            users = bot.UserApi.messages.getChatUsers(chat_id=chat, fields='nickname', v=5.60,
-                                                      name_case='nom')
+            users = data.chat_active
 
             user = random.choice(users)
-            ud = bot.GetUserNameById(user['id'])['sex']
+            ud = LongPoolUpdates.GetUserProfile(user).sex
             if ud == 2:
                 userGender = "masc"
             elif ud == 1:
@@ -195,7 +192,7 @@ class Command_Who(C_template):
                 except:
                     toins += "{} ".format(wrd)
             replies = ["Определённо {} {}", "Точно {} {}", "Я уверен что {} {}"]
-            if user['id'] == data['user_id']:
+            if user['id'] == data.user_id:
                 args['message'] = "Ты {}".format(toins.replace("тебе", "себе"))
                 bot.Replyqueue.put(args)
                 return True
@@ -203,7 +200,7 @@ class Command_Who(C_template):
                 args['message'] = 'Определённо Я'
                 bot.Replyqueue.put(args)
                 return True
-            name = '*id{} ({} {})'.format(str(user['id']),user['first_name'], user['last_name'])
+            name = '*id{} ({} {})'.format(str(user['id']), user['first_name'], user['last_name'])
 
             msg = random.choice(replies)
             args['message'] = msg.format(name, toins)
@@ -216,12 +213,13 @@ class Command_Prob(C_template):
     access = ["all"]
     desc = "Процент правдивости инфы"
     perm = 'text.prob'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
-        a = data['message'].split(' ')
+            args.update({"forward_messages": data.id})
+        a = data.body.split(' ')
         if 'вероятность' in a[1]:
             a = a[2:]
         else:
@@ -238,11 +236,12 @@ class Command_Where(C_template):
     desc = "Говорит где что находится "
     perm = 'text.where'
     cost = 2
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
+            args.update({"forward_messages": data.id})
         replies = ["Под столом", "На кровати", "За спиной", "На столе"]
         msg = random.choice(replies)
         args['message'] = msg
@@ -256,30 +255,31 @@ class Command_You(C_template):
     desc = "Не обзывай бота"
     template = "Чё блоть? Это сообщение не должно выводится ни в каком случае. Что вы сделали что б бот его написал? Это невозможно блоть"
     perm = 'text.you'
-    @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        user = bot.GetUserNameById(data['user_id'])
-        try:
-            if user['sex'] == 2:
-                replies = ["Сам ты {}", "Сам ты {}", "Сам ты {}", "Сам такой"]
-            elif user['sex'] == 1:
-                replies = ["Сама ты {}", "Сама ты {}", "Сама ты {}", "Сама такая"]
-            else:
-                replies = ["Само ты {}", "Само ты {}", "Само ты {}", "Само такое"]
-        except:
-            replies = ["Само ты {}", "Само ты {}", "Само ты {}", "Само такое"]
-        msg = random.choice(replies)
 
-        try:
-            args['message'] = msg.format(' '.join(data['text'].split(' ')))
-        except:
-            args['message'] = msg
-        # self.Reply(self.UserApi, args)
-        bot.Replyqueue.put(args)
-        return True
+
+def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+    args = {"peer_id": data.chat_id, "v": "5.60", }
+    if forward:
+        args.update({"forward_messages": data.id})
+    user = LongPoolUpdates.GetUserProfile(data.user_id)
+    try:
+        if user.sex == 2:
+            replies = ["Сам ты {}", "Сам ты {}", "Сам ты {}", "Сам такой"]
+        elif user.sex == 1:
+            replies = ["Сама ты {}", "Сама ты {}", "Сама ты {}", "Сама такая"]
+        else:
+            replies = ["Само ты {}", "Само ты {}", "Само ты {}", "Само такое"]
+    except:
+        replies = ["Само ты {}", "Само ты {}", "Само ты {}", "Само такое"]
+    msg = random.choice(replies)
+
+    try:
+        args['message'] = msg.format(' '.join(data.text.split(' ')))
+    except:
+        args['message'] = msg
+    # self.Reply(self.UserApi, args)
+    bot.Replyqueue.put(args)
+    return True
 
 
 class Command_Help(C_template):
@@ -288,34 +288,36 @@ class Command_Help(C_template):
     desc = "Выводит это сообщение"
     template = '"{botname}, помощь" или "{botname}, команды" - выводится список команд,\nа "{botname}, помощь НАЗВАНИЕ КОМАНДЫ" или "{botname}, команды НАЗВАНИЕ_КОМАНДЫ" - Выведет шаблон запроса'
     perm = 'text.help'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
-        if len(data['text'].split(' ')) >= 1 and data['text'].split(' ')[0] != "":
-            print(data['text'].split(' '))
-            Command_Help.GetHelp(bot, data,data['text'].split(' ')[0], forward)
+            args.update({"forward_messages": data.id})
+        if len(data.text.split(' ')) >= 1 and data.text.split(' ')[0] != "":
+            print(data.text.split(' '))
+            Command_Help.GetHelp(bot, data, data.text.split(' ')[0], forward)
             return
         args['topic'] = 'Список команд'
         a = "Вам доступны:\n"
-        UserPerms = bot.USERS.GetPerms(data['user_id'])
+        UserPerms = bot.USERS.GetPerms(data.user_id)
         for command in bot.MODULES.GetAvailable(UserPerms):
             a += 'Команда: "{}", {}. Стоимость: {}\n'.format('" или "'.join(command.names), command.desc, command.cost)
         args['message'] = str(a)
         bot.Replyqueue.put(args)
         return True
+
     @staticmethod
-    def GetHelp(bot, data,command, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def GetHelp(bot: Vk_bot2.Bot, data, command, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
+            args.update({"forward_messages": data.id})
         if bot.MODULES.isValid(command):
             mod = bot.MODULES.GetModule(command)
             try:
-                args['message'] = mod.template.format(botname = bot.MyName['first_name'])
+                args['message'] = mod.template.format(botname=bot.MyName['first_name'])
             except:
-                args['message'] = mod.template.format(botname = "Имя бота")
+                args['message'] = mod.template.format(botname="Имя бота")
 
         else:
             args['message'] = 'Неизвестная команда'
@@ -328,18 +330,18 @@ class Command_resend(C_template):
     desc = "Пересылает фото"
     template = "{botname}, перешли"
     perm = 'text.resend'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
-        atts = data['attachments']
+            args.update({"forward_messages": data.id})
 
         Topost = []
-        for att in atts:
+        for att in data.attachments:
             try:
 
-                photo = bot.GetBiggesPic(att, data['message_id'])
+                photo = att.photo
             except:
                 return 'Error'
 
@@ -363,24 +365,25 @@ class Command_kick(C_template):
     desc = "Изгоняет пользователя"
     template = "{}, изгнать UID1 UID2 UID3"
     perm = 'chat.kick'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
-        ToKick = list(data['custom']['id']) if 'id' in data['custom'] else data['text'].split(' ')
+            args.update({"forward_messages": data.id})
+        ToKick = list(data.custom['id']) if 'id' in data.custom else data.text.split(' ')
         if len(ToKick) < 1:
             return False
 
         for user in ToKick:
-            if bot.USERS.GetStatus(data['user_id']) in ['admin', 'moder']:
+            if bot.USERS.GetStatus(data.user_id) in ['admin', 'moder']:
                 args['message'] = "Нельзя кикать администрацию"
                 bot.Replyqueue.put(args)
                 continue
-            name = bot.GetUserNameById(user)
+            name = LongPoolUpdates.GetUserProfile(data.user_id)
             args['message'] = "The kickHammer has spoken\n {} has been kicked in the ass".format(
-                ' '.join([name['first_name'], name['last_name']]))
-            bot.UserApi.messages.removeChatUser(v=5.45, chat_id=data['peer_id'] - 2000000000, user_id=user)
+                ' '.join([name.first_name, name.last_name]))
+            bot.UserApi.messages.removeChatUser(v=5.45, chat_id=data.id - 2000000000, user_id=user)
             bot.Replyqueue.put(args)
         return True
 
@@ -391,25 +394,26 @@ class Command_JoinFiveNigths(C_template):
     desc = "Добавляет в беседу"
     perm = 'text.joinChat'
     template = '{}, 5nights'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
-        are_friend = bot.UserApi.friends.areFriends(user_ids=[data['user_id']])[0]['friend_status']
+            args.update({"forward_messages": data.id})
+        are_friend = bot.UserApi.friends.areFriends(user_ids=[data.user_id])[0]['friend_status']
         if int(are_friend) == 3:
-            ans = bot.UserApi.messages.addChatUser(chat_id=13, user_id=data['user_id'])
-            # ans = bot.UserApi.messages.addChatUser(chat_id=22, user_id=data['user_id'])
+            ans = bot.UserApi.messages.addChatUser(chat_id=13, user_id=data.user_id)
+            # ans = bot.UserApi.messages.addChatUser(chat_id=22, user_id=data.user_id)
 
             if int(ans) != 1:
                 args['message'] = 'Ошибка добавления'
             return True
 
         else:
-            f = int(bot.UserApi.friends.add(user_id=data['user_id'], text='Что б добавить в беседу'))
+            f = int(bot.UserApi.friends.add(user_id=data.user_id, text='Что б добавить в беседу'))
             if f == 1 or f == 2:
 
-                ans = bot.UserApi.messages.addChatUser(chat_id=13, user_id=data['user_id'])
+                ans = bot.UserApi.messages.addChatUser(chat_id=13, user_id=data.user_id)
                 args['message'] = 'Примите завяку и снова напишите !5nights'
                 if int(ans) != 1:
                     args['message'] = 'Ошибка добавления'
@@ -426,12 +430,13 @@ class Command_ExecCode(C_template):
     desc = "Выполняет код из сообщения"
     perm = 'core.PY'
     template = '{}, py\nВаш код здесь'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
-        code = bot.html_decode(data['message'])
+            args.update({"forward_messages": data.id})
+        code = bot.html_decode(data.body)
         code = '\n'.join(code.split('<br>')[1:]).replace('|', '  ')
         code = code.replace('print', 'print_')
         a = compile(code, '<string>', 'exec')
@@ -446,9 +451,6 @@ class Command_ExecCode(C_template):
             sys.stdout = stdout
             yield stdout
             sys.stdout = old
-
-
-
 
         l = {'api': bot.UserApi, 'bot': bot}
         g = {'os': None}
@@ -477,11 +479,12 @@ class Command_StatComm(C_template):
     desc = "Статистика"
     perm = 'text.info'
     template = '{}, инфо'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
+            args.update({"forward_messages": data.id})
         msg = 'Кол-во обработанных сообщений: {}\nКол-во выполеных команд: {}\nЗарегестрировано польхователей: {}\nРазмер кэша: {}\nКол-во живых потоков: {}\n'
         args['message'] = msg.format(bot.Stat['messages'], bot.Stat['commands'], len(bot.USERS.DB), bot.Stat['cache'],
                                      len([thread for thread in bot.EX_threadList if thread.is_alive()]))
@@ -495,11 +498,12 @@ class Command_AdminOnly(C_template):
     desc = "Врубает режим АдминОнли"
     perm = 'core.debug'
     template = '{}, дебаг'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
+            args.update({"forward_messages": data.id})
         bot.AdminModeOnly = not bot.AdminModeOnly
         msgOn = 'Включен режим дебага, принимаются сообщения только от админов'
         msgOff = 'Выключен режим дебага, принимаются все сообщения '
@@ -518,23 +522,24 @@ class _Command_BanAllGroupUsers(C_template):
                'группа:ИД группы\n' \
                'комантарий:Ваш комент\n' \
                'время:срок в часах'
+
     @staticmethod
-    def execute(bot, data, forward=True):
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
         exclude = 75615891
-        ToBan = bot.GroupApi.groups.getMembers(group_id=data['custom']["id"],count=1000)['items']
-        if data['custom']["id"] == exclude:
+        ToBan = bot.GroupApi.groups.getMembers(group_id=data.custom["id"], count=1000)['items']
+        if data.custom["id"] == exclude:
             return
         args = {'v': "5.60", 'group_id': exclude}
 
-        if "причина" in data['custom']:
+        if "причина" in data.custom:
             reason = int(args["причина"])
             args['reason'] = reason
-        if "группа" in data['custom']:
-            args['group_id'] = data['custom']["группа"]
+        if "группа" in data.custom:
+            args['group_id'] = data.custom["группа"]
         else:
             args['group_id'] = bot.Group.replace("-", "")
-        if data['custom']["комментарий"]:
-            comment = data['custom']["комментарий"]
+        if data.custom["комментарий"]:
+            comment = data.custom["комментарий"]
             args['comment'] = comment
             args['comment_visible'] = 1
 
@@ -553,11 +558,12 @@ class Command_About(C_template):
     desc = 'Выводит информацию о боте'
     perm = 'text.about'
     template = '{}, about'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
+            args.update({"forward_messages": data.id})
 
         args['message'] = \
             'Создан *red_eye_rus (Red Dragon)\n' \
@@ -566,20 +572,19 @@ class Command_About(C_template):
         bot.Replyqueue.put(args)
 
 
-
-
 class Command_LockName(C_template):
     name = ["namelock"]
     access = ["admin"]
     desc = "Лочит имя беседы"
     perm = 'chat.LockName'
     template = '{}, namelock'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
-        id = int(data['peer_id'])
+            args.update({"forward_messages": data.id})
+        id = int(data.id)
         if id not in bot.Settings['namelock']:
             args['message'] = 'Смена названия беседы запрещена'
             bot.Replyqueue.put(args)
@@ -600,13 +605,15 @@ class Command_quit(C_template):
     desc = "Выключение бота"
     perm = 'core.shutdown'
     template = '{}, shutdown'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", "forward_messages": data['message_id'],
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id,
                 "message": "Увидимся позже"}
         bot.Replyqueue.put(args)
         sleep(2)
         os._exit(0)
+
 
 class Command_restart(C_template):
     name = ["рестарт"]
@@ -614,80 +621,10 @@ class Command_restart(C_template):
     desc = "Рестарт бота"
     perm = 'core.restart'
     template = '{}, рестарт'
-    @staticmethod
-    def execute(bot, data, forward=True):
-        from subprocess import Popen
-        print(sys.executable, os.path.join(bot.ROOT, 'Vk_bot2.py'),'',bot.ROOT)
-        os.execl(sys.executable,sys.executable, os.path.join(bot.ROOT, 'Vk_bot2.py'))
-class _Command_restart(C_template):
-    name = ["рестарт"]
-    access = ['admin']
-    desc = "Рестарт бота"
-    perm = 'core.restart'
-    @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60"}
-        args['message'] = "Перезапуск всех потоков начат"
-        bot.Replyqueue.put(args)
-        with bot.Checkqueue.mutex:
-            bot.Checkqueue.queue.clear()
-        with bot.Longpool.mutex:
-            bot.Longpool.queue.clear()
-        sleep(3)
-        # del bot.UserApi
-        # del bot.GroupSession
-        # del bot.UserSession
-        # del bot.GroupApi
 
-        bot.UserSession = SessionCapchaFix(access_token=bot.UserAccess_token)
-        bot.GroupSession = SessionCapchaFix(access_token=bot.GroupAccess_token)
-        bot.GroupApi = API(bot.GroupSession)
-        bot.UserpApi = API(bot.UserSession)
-        t = len(bot.LP_threads)
-        for th in bot.LP_threads:
-            try:
-                th._stop()
-                th.join()
-                bot.LP_threads.pop(th)
-            except:
-                t -= 1
-        for i in range(t):
-            bot.LP_threads.append(threading.Thread(target=bot.parseLongPool))
-            bot.LP_threads[i].setDaemon(True)
-            bot.LP_threads[i].start()
-        t = len(bot.EX_threadList)
-        for th in bot.EX_threadList:
-            try:
-                th._stop()
-                th.join()
-                bot.EX_threadList.pop(th)
-            except:
-                t -= 1
-        for i in range(t):
-            bot.EX_threadList.append(threading.Thread(target=bot.ExecCommands))
-            bot.EX_threadList[i].setDaemon(True)
-            bot.EX_threadList[i].start()
-        print("Чистим все ответы")
-        with bot.Replyqueue.mutex:
-            bot.Replyqueue.queue.clear()
-        bot.ReplyThread._reset_internal_locks(False)
-        bot.ReplyThread._stop()
-        bot.ReplyThread.join()
-        del bot.ReplyThread
-        bot.ReplyThread = threading.Thread(target=bot.Reply)
-        bot.ReplyThread.setDaemon(True)
-        bot.ReplyThread.start()
-        print("Перезапуск закончен")
-        Reloaded = 'Перезагружены\n'+'\n'.join(bot.MODULES.Reload())
-        args['message'] = Reloaded + "\nПерезапуск закончен"
-        bot.Replyqueue.put(args)
-        # os.system("RESTART.bat {}".format(os.getpid()))
-        # #os.startfile(__file__,sys.executable)
-        # #subprocess.Popen([sys.executable,__file__],close_fds=True,creationflags=0x00000008)
-        # sleep(1)
-        # #print(os.spawnv(os.P_NOWAIT, sys.executable, [__file__]))
-        # os._exit(1)
-        # #os.execv(__file__, sys.argv)
+    @staticmethod
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        os.execl(sys.executable, sys.executable, os.path.join(bot.ROOT, 'Vk_bot2.py'))
 
 
 class Command_ithappens(C_template):
@@ -696,6 +633,7 @@ class Command_ithappens(C_template):
     desc = "Рандомная история с ithappens.me"
     perm = 'text.Zadolbali'
     template = '{}, этослучилось'
+
     class MLStripper(HTMLParser):
         def __init__(self):
             super().__init__()
@@ -715,10 +653,10 @@ class Command_ithappens(C_template):
         return s.get_data()
 
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
+            args.update({"forward_messages": data.id})
         feed = feedparser.parse('http://www.ithappens.me/rss')['entries']
         zz = random.choice(feed)
         template = """      {}
@@ -741,13 +679,14 @@ class Command_banCommand(C_template):
     perm = 'chat.BlockCommand'
     template = '{}, блок\n' \
                'команда:название команды\n'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        comm = data['custom']['команда']
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        comm = data.custom['команда']
         if comm in ['bannedCommands']:
-            bot.Settings['bannedCommands'][comm].append(str(data['peer_id']))
+            bot.Settings['bannedCommands'][comm].append(str(data.id))
         else:
-            bot.Settings['bannedCommands'][comm] = [str(data['peer_id'])]
+            bot.Settings['bannedCommands'][comm] = [str(data.id)]
 
 
 class Command_Choice(C_template):
@@ -756,12 +695,13 @@ class Command_Choice(C_template):
     desc = "Выбирает из представленных вариантов"
     perm = 'text.choice'
     template = '{}, вариант1 вариант2 вариант3 вариантN '
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
-        vars = data['text'].split(' ')
+            args.update({"forward_messages": data.id})
+        vars = data.text.split(' ')
         var = random.choice(vars)
         templates = ['Я выбираю: {}', "Вот это: {}", "Думаю это лучший вариант: {}"]
         args['message'] = random.choice(templates).format(var)
@@ -774,12 +714,13 @@ class Command_EvalJS(C_template):
     access = ['admin']
     desc = 'Выполняет JS скрипт'
     perm = 'core.EvJs'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
-        code = bot.html_decode(' '.join(data['message'].split('<br>')[1:]))
+            args.update({"forward_messages": data.id})
+        code = bot.html_decode(' '.join(data.body.split('<br>')[1:]))
         JavaScript = execjs.get(execjs.runtime_names.Node)
         print('JavaScript runtime -- ', execjs.get().name)
         js = JavaScript.eval(code)
@@ -794,12 +735,13 @@ class Command_ExecJS(C_template):
     access = ['admin']
     desc = 'Выполняет JS скрипт, (вызываетмый метод - exec)'
     perm = 'core.ExJs'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
-        code = bot.html_decode(' '.join(data['message'].split('<br>')[1:]))
+            args.update({"forward_messages": data.id})
+        code = bot.html_decode(' '.join(data.body.split('<br>')[1:]))
         JavaScript = execjs.get(execjs.runtime_names.Node)
         print('JavaScript runtime -- ', execjs.get().name)
         js = JavaScript.compile(code)
@@ -817,9 +759,9 @@ class Command_ExecJS(C_template):
 #    access = ['admin']
 #    desc = 'Выполняет JS скрипт'
 #    @staticmethod
-#    def execute(bot,data):
-#        args = {"peer_id": data['peer_id'], "v": "5.60", "forward_messages": data['message_id']}
-#        code = bot.html_decode(' '.join(data['message'].split('<br>')[1:]))
+#    def execute(bot:Vk_bot2.bot,data):
+#        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
+#        code = bot.html_decode(' '.join(data.body.split('<br>')[1:]))
 #        l = lua.eval(code)
 #        args['message'] = l
 #        bot.Replyqueue.put(args)
@@ -830,21 +772,21 @@ class Command_TTS(C_template):
     desc = 'Произносит ваш текст на выбранном языке ("Имя бота", "нужный язык (2буквы)" " ВАШ ТЕКСТ")'
     perm = 'text.tts'
     template = '{}, нужный язык(2буквы) ВАШ ТЕКСТ)'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
+            args.update({"forward_messages": data.id})
         apiurl = 'https://api.vk.com/method/docs.getUploadServer?access_token={}&type=audio_message&v=5.60'.format(
             bot.UserAccess_token)
         print(apiurl)
         server = json.loads(urlopen(apiurl).read().decode('utf-8'))['response']['upload_url']
         print(server)
         for i in Command_TTS.name:
-            if i in data['message']:
-                text = data['message'].replace('<br>', '').split(i)[-1].split(" ")[1:]
-        # text = data['text'].split(' ')
-        print(text)
+            if i in data.body:
+                text = data.body.replace('<br>', '').split(i)[-1].split(" ")[1:]
+        # text = data.text.split(' ')
         lang = text[0]
         if lang not in gtts.gTTS.LANGUAGES:
             args[
@@ -874,57 +816,58 @@ class Command_TTS(C_template):
             bot.Replyqueue.put(args)
 
 
-class Command_RemoteExec(C_template):
-    name = ["безпалева"]
-    access = ['admin']
-    desc = "Выполняет команду в лс/беседе другого человека"
-    perm = 'core.remoteExec'
-    @staticmethod
-    def execute(bot, data, forward=True):
-        RemoteData = copy.deepcopy(data)
-        args = {"peer_id": data['peer_id'], "v": "5.60"}
-        CustomArgs = data['custom']
-        if ('peer_id' not in CustomArgs) or ('command' not in CustomArgs):
-            return False
-        for t in data['custom']:
-            RemoteData.update({t: data['custom'][t]})
-        if int(CustomArgs['peer_id']) < 2000000000:
-            try:
-                print(CustomArgs['peer_id'])
-                a = bot.UserApi.messages.getChat(chat_id=int(CustomArgs['peer_id']))
-                RemoteData.update({'peer_id': int(CustomArgs['peer_id']) + 2000000000})
-            except Exception as E:
-                print(E)
-                bot.Replyqueue.put(
-                    {"peer_id": data['peer_id'], "v": "5.60", 'message': 'Другим людям в личку нельзя писать'})
-                return 'error'
-        chat = bot.UserApi.messages.getChat(
-            chat_id=int(CustomArgs['peer_id']) if int(CustomArgs['peer_id']) < 2000000000 else int(
-                CustomArgs['peer_id']) - 2000000000)['title']
-        args['message'] = "Нужная беседа - {}?".format(chat)
-        bot.Replyqueue.put(args)
-        ans = bot.WaitForMSG(3, data)
-        print(ans)
-        if re.match(r'(Д|д)а', ans):
-            pass
-        elif re.match(r'(Н|н)ет', ans):
-            args['message'] = 'Ну тогда попробуй еще раз'
-            bot.Replyqueue.put(args)
-            return "error"
-        try:
-            bot.MODULES.GetModule[CustomArgs['command'].replace(' ', '')][bot.MODULES.TYPES.funk].execute(bot,
-                                                                                                          RemoteData,
-                                                                                                          False)
-        except Exception as E:
-
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            TB = traceback.format_tb(exc_traceback)
-
-            args['message'] = "Неудалось выполнить команду удалённо, ошибка:{}\n {}\n {} \n {}".format(exc_type,
-                                                                                                       exc_value,
-                                                                                                       ''.join(TB),
-                                                                                                       "Перешлите это сообщение владельцу бота")
-            bot.Replyqueue.put(args)
+#class _Command_RemoteExec(C_template):
+#    name = ["безпалева"]
+#    access = ['admin']
+#    desc = "Выполняет команду в лс/беседе другого человека"
+#    perm = 'core.remoteExec'
+#
+#    @staticmethod
+#    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+#        RemoteData = copy.deepcopy(data)
+#        args = {"peer_id": data.chat_id, "v": "5.60"}
+#        CustomArgs = data.custom
+#        if ('peer_id' not in CustomArgs) or ('command' not in CustomArgs):
+#            return False
+#        for t in data.custom:
+#            RemoteData.update({t: data.custom[t]})
+#        if int(CustomArgs['peer_id']) < 2000000000:
+#            try:
+#                print(CustomArgs['peer_id'])
+#                a = bot.UserApi.messages.getChat(chat_id=int(CustomArgs['peer_id']))
+#                RemoteData.update({'peer_id': int(CustomArgs['peer_id']) + 2000000000})
+#            except Exception as E:
+#                print(E)
+#                bot.Replyqueue.put(
+#                    {"peer_id": data.chat_id, "v": "5.60", 'message': 'Другим людям в личку нельзя писать'})
+#                return 'error'
+#        chat = bot.UserApi.messages.getChat(
+#            chat_id=int(CustomArgs['peer_id']) if int(CustomArgs['peer_id']) < 2000000000 else int(
+#                CustomArgs['peer_id']) - 2000000000)['title']
+#        args['message'] = "Нужная беседа - {}?".format(chat)
+#        bot.Replyqueue.put(args)
+#        ans = bot.WaitForMSG(3, data)
+#        print(ans)
+#        if re.match(r'(Д|д)а', ans):
+#            pass
+#        elif re.match(r'(Н|н)ет', ans):
+#            args['message'] = 'Ну тогда попробуй еще раз'
+#            bot.Replyqueue.put(args)
+#            return "error"
+#        try:
+#            execute(bot,
+#                    RemoteData,
+#                    False)
+#        except Exception as E:
+#
+#            exc_type, exc_value, exc_traceback = sys.exc_info()
+#            TB = traceback.format_tb(exc_traceback)
+#
+#            args['message'] = "Неудалось выполнить команду удалённо, ошибка:{}\n {}\n {} \n {}".format(exc_type,
+#                                                                                                       exc_value,
+#                                                                                                       ''.join(TB),
+#                                                                                                       "Перешлите это сообщение владельцу бота")
+#            bot.Replyqueue.put(args)
 
 
 class Command_AboutUser(C_template):
@@ -935,17 +878,17 @@ class Command_AboutUser(C_template):
     template = '{}, whoami'
 
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
+            args.update({"forward_messages": data.id})
 
-        userperms = bot.USERS.GetPerms(data['user_id'])
-        userstatus = bot.USERS.GetStatus(data['user_id'])
-        UD = VK_foaf.GetUser(data['user_id'])
+        userperms = bot.USERS.GetPerms(data.user_id)
+        userstatus = bot.USERS.GetStatus(data.user_id)
+        UD = VK_foaf.GetUser(data.user_id)
         msg_template = "Ваш статус - {}\nВаш id - {}\nВаши права :\n{}\nЗарегистрирован {}\nДень рождения {}\n пол {}\nКол-во внутренней валюты: {}\n"
-        msg = msg_template.format(userstatus, data['user_id'], ',\n'.join(userperms), UD['reg'], UD['Bday'],
-                                  UD['gender'], bot.USERS.GetCurrency(data['user_id']))
+        msg = msg_template.format(userstatus, data.user_id, ',\n'.join(userperms), UD['reg'], UD['Bday'],
+                                  UD['gender'], bot.USERS.GetCurrency(data.user_id))
         args['message'] = msg
         bot.Replyqueue.put(args)
 
@@ -956,12 +899,13 @@ class Command_Whois(C_template):
     desc = 'Выводит информацию о вашем статусе и правах у бота'
     perm = 'text.whois'
     template = '{}, whois'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
-        bb = data['text'].split(' ')
+            args.update({"forward_messages": data.id})
+        bb = data.text.split(' ')
         user = bb[0]
 
         try:
@@ -994,19 +938,19 @@ class Command_Zashkvar(C_template):
     desc = 'Замеряет зашкварность сообщения'
     perm = 'text.zashkvar'
     template = '{}, зашквар'
+
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
-        if 'fwd' in data['atts']:
+            args.update({"forward_messages": data.id})
+        if len(data.fwd_messages)>0:
             try:
-                message = bot.UserApi.messages.getById(v="5.60", message_ids=data['message_id'])['items'][0][
-                    'fwd_messages'][0]
+                message = data.fwd_messages[0]
                 try:
-                    temp = len(message['body'])
+                    temp = len(message.body)
                 except:
-                    temp = message['date']
+                    temp = message.date
             except:
                 args['message'] = "Непонятная ошибочка."
                 bot.Replyqueue.put(args)

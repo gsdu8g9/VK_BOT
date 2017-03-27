@@ -15,13 +15,10 @@ class Command_SetStatus(C_template):
 
 
     @staticmethod
-    def execute(bot, data, forward=True):
-
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
         print('Adduser: ', data)
-        bb = data['text'].split(' ')
+        bb = data.text.split(' ')
         user = bb[0]
         stat = bb[1]
         print(user, stat)
@@ -47,12 +44,10 @@ class Command_RemovePerms(C_template):
     perm = 'core.Removeperms'
 
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
         print('Adduser: ', data)
-        bb = data['text'].split(' ')
+        bb = data.text.split(' ')
         user = bb[0]
         perms = bb[1:]
         bot.USERS.WritePerms(user, bot.USERS.Actions.Remove, *perms)
@@ -76,12 +71,10 @@ class Command_WritePerms(C_template):
     perm = 'core.Writeperms'
 
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
         print('Adduser: ', data)
-        bb = data['text'].split(' ')
+        bb = data.text.split(' ')
         user = bb[0]
         perms = bb[1:]
         bot.USERS.WritePerms(user, bot.USERS.Actions.Add, *perms)

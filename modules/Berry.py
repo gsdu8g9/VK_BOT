@@ -17,8 +17,8 @@ class Command_PiStat(C_template):
     desc = 'Выводит информацию о RaspberryPi'
     enabled = True
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, Updates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
             args.update({"forward_messages": data['message_id']})
         template = 'Темпуратура CPU {} градусов\n' \
@@ -37,10 +37,10 @@ class Command_GITPULL(C_template):
     desc = 'git pull and git chechout'
 
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, Updates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
         if forward:
-            args.update({"forward_messages": data['message_id']})
+            args.update({"forward_messages": data.id})
         text = []
         p = os.popen('git pull -f')
 
@@ -62,8 +62,10 @@ class Command_LevelUP(C_template):
     template = '{botname}, THERE NO FUCKING HELP FOR YOU'
 
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
+    def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, Updates: Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", }
+        if forward:
+            args.update({"forward_messages": data.id})
         args['message'] = 'Запущена процедура обновления!'
         bot.Replyqueue.put(args)
         p = os.popen('git pull -f')

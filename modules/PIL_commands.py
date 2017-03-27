@@ -27,24 +27,24 @@ class Command_Glitch_(C_template):
     perm = 'photo.glitch2'
     cost = 10
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        sigma = int(data['custom']['sigma']) if 'sigma' in data['custom'] else 5
-        iter = int(data['custom']['iter']) if 'iter' in data['custom'] else 150
-        size = int(data['custom']['size']) if 'size' in data['custom'] else 32
-        Glitch_ = bool(data['custom']['color']) if 'color' in data['custom'] else True
-        random_ = bool(data['custom']['rand']) if 'rand' in data['custom'] else True
-        atts = data['attachments']
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
+        print(data.custom)
+        sigma = int(data.custom['sigma']) if 'sigma' in data.custom else 5
+        iter = int(data.custom['iter']) if 'iter' in data.custom else 150
+        size = int(data.custom['size']) if 'size' in data.custom else 32
+        Glitch_ = bool(data.custom['color']) if 'color' in data.custom else True
+        random_ = bool(data.custom['rand']) if 'rand' in data.custom else True
+        atts = data.attachments
+        print(data.attachments[0])
         Topost = []
         for att in atts:
             try:
 
-                photo = bot.GetBiggesPic(atts[0], data['message_id'])
+                photo = att.photo.photo
             except:
                 return False
-
+            print(photo)
             req = urllib.request.Request(photo, headers=HDR)
             img = urlopen(req).read()
             Tmp = TempFile(img, 'jpg')
@@ -67,18 +67,16 @@ class Command_GlitchGif_(C_template):
     perm = 'photo.glitchGif'
     cost = 20
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        sigma = int(data['custom']['sigma']) if 'sigma' in data['custom'] else 5
-        iter = int(data['custom']['iter']) if 'iter' in data['custom'] else 150
-        size = int(data['custom']['size']) if 'size' in data['custom'] else 32
-        vsh = bool(data['custom']['vsh']) if 'vsh' in data['custom'] else False
-        Glitch_ = bool(data['custom']['color']) if 'color' in data['custom'] else True
-        len_ = int(data['custom']['len']) if 'len' in data['custom'] else 60
-        random_ = bool(data['custom']['rand']) if 'rand' in data['custom'] else True
-        atts = data['attachments']
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
+        sigma = int(data.custom['sigma']) if 'sigma' in data.custom else 5
+        iter = int(data.custom['iter']) if 'iter' in data.custom else 150
+        size = int(data.custom['size']) if 'size' in data.custom else 32
+        vsh = bool(data.custom['vsh']) if 'vsh' in data.custom else False
+        Glitch_ = bool(data.custom['color']) if 'color' in data.custom else True
+        len_ = int(data.custom['len']) if 'len' in data.custom else 60
+        random_ = bool(data.custom['rand']) if 'rand' in data.custom else True
+        atts = data.attachments
         Topost = []
         for att in atts:
             print(att)

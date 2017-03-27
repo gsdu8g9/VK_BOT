@@ -2,6 +2,8 @@ import os
 import re
 import urllib
 from urllib.request import urlopen
+
+from DataTypes.LongPoolUpdate import Attachment
 from trigger import Trigger
 try:
 
@@ -38,14 +40,12 @@ class Command_Kok(C_template):
     desc = "Зеркалит картинку"
     perm = 'photo.kok'
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
         try:
-            att = data['attachments'][0]
-            print(att)
-            photo = bot.GetBiggesPic(att, data['message_id'])
+            att = data.attachments[0]
+            if att.type == Attachment.types.photo:
+                photo = att.photo.photo
         except:
             return False
         req = urllib.request.Request(photo, headers=HDR)
@@ -65,14 +65,12 @@ class Command_Kek(C_template):
     desc = "Зеркалит картинку"
     perm = 'photo.kek'
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
         try:
-            att = data['attachments'][0]
-            print(att)
-            photo = bot.GetBiggesPic(att, data['message_id'])
+            att = data.attachments[0]
+            if att.type == Attachment.types.photo:
+                photo = att.photo.photo
         except:
             return False
         req = urllib.request.Request(photo, headers=HDR)
@@ -93,14 +91,12 @@ class Command_Filter(C_template):
     perm = 'photo.filter'
     cost = 15
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        atts = data['attachments']
-
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
         try:
-            photo = bot.GetBiggesPic(atts[0], data['message_id'])
+            att = data.attachments[0]
+            if att.type == Attachment.types.photo:
+                photo = att.photo.photo
         except:
             return False
         req = urllib.request.Request(photo, headers=HDR)
@@ -112,8 +108,8 @@ class Command_Filter(C_template):
             Fname = bot.MODULES.FILTERS[FArr[filter_]].desc
             args['message'] += "{}. {}\n".format(filter_ + 1, Fname)
         bot.Replyqueue.put(args)
-        print(data['user_id'],data['peer_id'])
-        t = Trigger(cond = lambda Tdata:Tdata['user_id'] == data['user_id'] and Tdata['peer_id'] == data['peer_id'] and Tdata['message'].isnumeric(),callback=Command_Filter.Render,Tmp = Tmp,bot = bot,args = args, FArr = FArr)
+        print(data.user_id,data.chat_id)
+        t = Trigger(cond = lambda Tdata:Tdata.user_id == data.user_id and Tdata.chat_id == data.chat_id and Tdata['message'].isnumeric(),callback=Command_Filter.Render,Tmp = Tmp,bot = bot,args = args, FArr = FArr)
         bot.TRIGGERS.addTrigger(t)
 
     @staticmethod
@@ -142,13 +138,10 @@ class Command_Resize(C_template):
     desc = "Позволяет увеличивать\уменьшать фото"
     perm = 'photo.resize'
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        atts = data['attachments']
-        if 'size' in data['custom']:
-            x = int(data['custom']['size'])
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
+        if 'size' in data.custom:
+            x = int(data.custom['size'])
             if x > 3000:
                 args['message'] = "Неее, слишком жирно"
                 bot.Replyqueue.put(args)
@@ -158,9 +151,9 @@ class Command_Resize(C_template):
             bot.Replyqueue.put(args)
             return False
         Topost = []
-        for att in atts:
+        for att in data.attachments:
             try:
-                photo = bot.GetBiggesPic(att, data['message_id'])
+                photo = att.photo.photo
             except:
                 return False
             req = urllib.request.Request(photo, headers=HDR)
@@ -168,12 +161,11 @@ class Command_Resize(C_template):
             Tmp = TempFile(img, 'jpg', NoCache=True)
             args['message'] = 'Поднимать резкость?\n Да\Нет'
             bot.Replyqueue.put(args)
-            ans = bot.WaitForMSG(5, data)
-            t = Trigger(cond = lambda Tdata:Tdata['user_id'] == data['user_id'] and Tdata['peer_id'] == data['peer_id'] and (re.match(r'(Д|д)а',Tdata['message']) or re.match(r'(Н|н)ет',Tdata['message']) ),callback=Command_Resize.resize,Tmp = Tmp,bot = bot,args = args)
+            t = Trigger(cond = lambda Tdata:Tdata.user_id == data.user_id and Tdata.chat_id == data.chat_id and (re.match(r'(Д|д)а',Tdata.body) or re.match(r'(Н|н)ет',Tdata.body) ),callback=Command_Resize.resize,Tmp = Tmp,bot = bot,args = args,x = x)
             bot.TRIGGERS.addTrigger(t)
     @staticmethod
-    def resize(data,result,Tmp,bot,args,FArr):
-        ans = data['message']
+    def resize(data:LongPoolMessage,result,Tmp,bot,args,FArr,x):
+        ans = data.body
         if ans == None:
             Tmp.rem()
             args['message'] = "Время ожидания ответа истекло"
@@ -203,19 +195,17 @@ class Command_e621(C_template):
     desc = "Ищет пикчи на e612"
     perm = 'core.e621'
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        data['custom']['tags'] = BeautifulSoup(data['custom']['tags'], "html.parser").get_text()
-        tags = data['custom']['tags'].replace(' ', '').split(';') if 'tags' in data['custom'] else None
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
+        data.custom['tags'] = BeautifulSoup(data.custom['tags'], "html.parser").get_text()
+        tags = data.custom['tags'].replace(' ', '').split(';') if 'tags' in data.custom else None
         if tags == None:
             args['message'] = Command_e926.info
             bot.Replyqueue.put(args)
             return True
-        n = int(data['custom']['n']) if 'n' in data['custom'] else 5
-        page = int(data['custom']['page']) if 'page' in data['custom'] else 1
-        sort_ = data['custom']['sort'].replace(' ', '') if 'sort' in data['custom'] else 'score'
+        n = int(data.custom['n']) if 'n' in data.custom else 5
+        page = int(data.custom['page']) if 'page' in data.custom else 1
+        sort_ = data.custom['sort'].replace(' ', '') if 'sort' in data.custom else 'score'
         posts = e6.get(tags=tags, n=n, page=page, sort_=sort_)
         msg_template = '{} - {}\n'
         msg = ""
@@ -245,19 +235,18 @@ class Command_e926(C_template):
     perm = 'photo.e926'
     cost = 15
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        data['custom']['tags'] = BeautifulSoup(data['custom']['tags'] , "html.parser").get_text()
-        tags = data['custom']['tags'].replace(' ', '').split(';') if 'tags' in data['custom'] else None
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
+        args['message'] = 'Change me'
+        data.custom['tags'] = BeautifulSoup(data.custom['tags'] , "html.parser").get_text()
+        tags = data.custom['tags'].replace(' ', '').split(';') if 'tags' in data.custom else None
         if tags == None:
             args['message'] = Command_e926.info
             bot.Replyqueue.put(args)
             return True
-        n = int(data['custom']['n']) if 'n' in data['custom'] else 5
-        page = int(data['custom']['page']) if 'page' in data['custom'] else 1
-        sort_ = data['custom']['sort'].replace(' ', '') if 'sort' in data['custom'] else 'score'
+        n = int(data.custom['n']) if 'n' in data.custom else 5
+        page = int(data.custom['page']) if 'page' in data.custom else 1
+        sort_ = data.custom['sort'].replace(' ', '') if 'sort' in data.custom else 'score'
         posts = e6.getSafe(tags=tags, n=n, page=page, sort_=sort_)
         msg_template = '{} - {}\n'
         msg = ""
@@ -281,16 +270,14 @@ class Command_rollRows(C_template):
     desc = "Сдвигает строки в фото"
     perm = 'photo.rollRows'
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        delta = int(args['delta']) if 'delta' in data['custom'] else 20
-        atts = data['attachments']
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
+        delta = int(args['delta']) if 'delta' in data.custom else 20
+
         Topost = []
-        for att in atts:
+        for att in data.attachments:
             try:
-                photo = bot.GetBiggesPic(att, data['message_id'])
+                photo = att.photo.photo
             except:
                 return False
 
@@ -313,18 +300,17 @@ class Command_rollRowssmart(C_template):
     desc = "Сдвигает строки в фото"
     perm = 'photo.rollRowssmart'
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        delta = int(args['delta']) if 'delta' in data['custom'] else 20
-        atts = data['attachments']
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
+        delta = int(args['delta']) if 'delta' in data.custom else 20
+
         Topost = []
-        for att in atts:
+        for att in data.attachments:
             try:
-                photo = bot.GetBiggesPic(att, data['message_id'])
+                photo = att.photo.photo
             except:
                 return False
+
 
             req = urllib.request.Request(photo, headers=HDR)
             img = urlopen(req).read()
@@ -345,12 +331,9 @@ class Command_AddImages(C_template):
     desc = "Соединяет 2 фото"
     perm = 'photo.add'
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        atts = data['attachments']
-        # print(atts)
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
+        atts = data.attachments
         if len(atts) < 2:
             args['message'] = 'Нужны 2 файла'
             bot.Replyqueue.put(args)
@@ -358,11 +341,11 @@ class Command_AddImages(C_template):
 
         try:
 
-            photo = bot.GetBiggesPic(atts[0], data['message_id'])
+            photo =atts[0].photo.photo
         except:
             return False
         try:
-            photo1 = bot.GetBiggesPic(atts[1], data['message_id'])
+            photo1 = atts[1].photo.photo
         except:
             return False
         req = urllib.request.Request(photo, headers=HDR)
@@ -388,11 +371,9 @@ class Command_merge(C_template):
     desc = "Соединяет 2 фото"
     perm = 'photo.merge'
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        atts = data['attachments']
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
+        atts = data.attachments
         # print(atts)
         if len(atts) < 2:
             args['message'] = 'Нужны 2 файла'
@@ -401,11 +382,11 @@ class Command_merge(C_template):
 
         try:
 
-            photo = bot.GetBiggesPic(atts[0], data['message_id'])
+            photo =atts[0].photo.photo
         except:
             return False
         try:
-            photo1 = bot.GetBiggesPic(atts[1], data['message_id'])
+            photo1 = atts[1].photo.photo
         except:
             return False
         req = urllib.request.Request(photo, headers=HDR)
@@ -433,10 +414,8 @@ class Command_screen(C_template):
     desc = "Скрин экрана"
     perm = 'core.screen'
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
         im = ImageGrab.grab()
         pt = TempFile.generatePath('jpg')
         im.save(pt)
@@ -453,16 +432,13 @@ class Command_GlitchImg(C_template):
     perm = 'photo.glitch'
     cost = 0
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        atts = data['attachments']
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
         Topost = []
 
-        for att in atts:
+        for att in data.attachments:
             try:
-                photo = bot.GetBiggesPic(att, data['message_id'])
+                photo = att.photo.photo
             except:
                 return False
             req = urllib.request.Request(photo, headers=HDR)
@@ -484,12 +460,10 @@ class Command_everyPixel(C_template):
     perm = 'photo.everypixel'
 
     @staticmethod
-    def execute(bot, data, forward=True):
-        args = {"peer_id": data['peer_id'], "v": "5.60", }
-        if forward:
-            args.update({"forward_messages": data['message_id']})
-        att = data['attachments'][0]
-        photo = bot.GetBiggesPic(att, data['message_id'])
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
+        att = data.attachments[0]
+        photo = att.photo.photo
         tags, quality = EveryPixel.GetTags(photo)
         tags_template = 'Я вижу тут:\n{}\n'
         tags_msg = tags_template.format('\n'.join(tags))

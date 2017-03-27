@@ -14,12 +14,12 @@ import trigger
 import requests
 from PIL import Image, ImageTk
 from vk import *
-
 from AIML_module import Responder
 from Module_Manager import *
 from User_Manager import *
 from tempfile_ import *
 from DataTypes.LongPoolUpdate import *
+import vk.exceptions as VKEX
 HDR = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -86,17 +86,11 @@ class SessionCapchaFix(Session):
 class Bot:
     def __init__(self, threads=4, LP_Threads=1, DEBUG=False):
         self.ROOT = getpath()
-        self.IMAGES = os.path.join(self.ROOT,'IMAGES')
+        self.IMAGES = os.path.join(self.ROOT, 'IMAGES')
         self.Responder = Responder()
-        self.Longpool = queue.Queue()
         self.Checkqueue = queue.Queue()
         self.Replyqueue = queue.Queue()
         self.LP_threads = []
-        #for i in range(LP_Threads):
-        #    self.LP_threads.append(threading.Thread(target=self.parseLongPool))
-        #    self.LP_threads[i].setDaemon(True)
-        #    self.LP_threads[i].start()
-        #    print('LongPool thread №{} started'.format(i))
         self.EX_threadList = []
         for i in range(threads):
             self.EX_threadList.append(threading.Thread(target=self.ExecCommands))
@@ -104,7 +98,7 @@ class Bot:
             self.EX_threadList[i].start()
             print('Exec thread №{} started'.format(i))
         self.USERS = UserManager()
-        #self.MODULES = ModuleManager()
+        self.MODULES = ModuleManager()
         self.DEBUG = DEBUG
         self.TRIGGERS = trigger.TriggerHandler()
         self.AdminModeOnly = False
@@ -115,15 +109,19 @@ class Bot:
         self.SaveConfig()
 
         self.UserAccess_token = self.Settings['UserAccess_token']
-        self.GroupAccess_token = self.Settings['GroupAccess_token']
+        if 'GroupAccess_token' in self.Settings:
+            self.GroupAccess_token = self.Settings['GroupAccess_token']
+            self.GroupSession = SessionCapchaFix(access_token=self.GroupAccess_token)
+            self.GroupApi = API(self.GroupSession)
+        else:
+            self.GroupApi = None
 
         self.UserSession = SessionCapchaFix(access_token=self.UserAccess_token)
         self.DefSession = SessionCapchaFix()
-        self.GroupSession = SessionCapchaFix(access_token=self.GroupAccess_token)
+
 
         self.UserApi = API(self.UserSession)
         self.DefApi = API(self.DefSession)
-        self.GroupApi = API(self.GroupSession)
 
         self.log = io.open("Message_Log.Log", mode="ta", newline="\n", encoding="utf-8")
 
@@ -137,23 +135,34 @@ class Bot:
 
         print('LOADED')
 
+    def GetImg(self, name) -> str:
+        """
 
-    def GetImg(self,name):
+        Args:
+            name: Image name
+
+        Returns:
+            str:Path to img
+        """
         if name in os.listdir(self.IMAGES):
-            return os.path.join(self.IMAGES,name)
+            return os.path.join(self.IMAGES, name)
 
         else:
             raise FileNotFoundError('There is no file named {} in images folder'.format(name))
-    def GetUserFromMessage(self, message_id):
-        sleep(0.25)
 
-        try:
-            uid = self.UserApi.messages.getById(message_ids=message_id, v="5.60")['items'][0]['user_id']
-            return uid
-        except:
-            sleep(1)
-            uid = self.UserApi.messages.getById(message_ids=message_id, v="5.60")['items'][0]['user_id']
-            return uid
+    def GetUserFromMessage(self, message_id) ->str:
+        """
+
+        Args:
+            message_id: Message id
+
+        Returns:
+            str:user id
+        """
+
+
+        uid = self.UserApi.messages.getById(message_ids=message_id, v="5.60")['items'][0]['user_id']
+        return uid
 
     @staticmethod
     def html_decode(s):
@@ -168,61 +177,43 @@ class Bot:
             s = s.replace(code[1], code[0])
         return s
 
-    def GetUserNameById(self, Id, case='nom'):
+    def GetUserNameById(self, Id, case='nom') -> dict:
 
+        """
+
+        Args:
+            Id (int): User ID
+            case (str): case
+
+        Returns:
+            dict:User data
+        """
         try:
+            if case!='nom':
+                raise Exception('bad code here')
             if self.USERS.isCached(Id):
                 User = self.USERS.getCache(Id)
             else:
                 try:
                     User = self.DefApi.users.get(user_ids=Id, v="5.60", fields=['sex'], name_case=case)[0]
-                    self.USERS.cacheUser(Id,User)
+                    self.USERS.cacheUser(Id, User)
                 except Exception as Ex:
-
 
                     exc_type, exc_value, exc_traceback = sys.exc_info()
                     TB = traceback.format_tb(exc_traceback)
-                    print(TB,exc_type,exc_value)
+                    print(TB, exc_type, exc_value)
                     User = None
         except:
             try:
                 User = self.DefApi.users.get(user_ids=Id, v="5.60", fields=['sex'], name_case=case)[0]
-                self.USERS.cacheUser(Id,User)
+                self.USERS.cacheUser(Id, User)
             except Exception as Ex:
 
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 TB = traceback.format_tb(exc_traceback)
-                print(TB,exc_type,exc_value)
+                print(TB, exc_type, exc_value)
                 User = None
         return User
-
-    def WaitForMSG(self, tries, args):
-        print('WFM', args)
-
-        user = args['user_id']
-        peer_id = args['peer_id']
-        for _ in range(tries):
-            sleep(3)
-            hist = self.UserApi.messages.getHistory(**{"peer_id": peer_id, "user_id": user, "count": 50, 'v': 5.38})
-
-            for msg in hist['items']:
-
-                try:
-
-                    if (int(msg['from_id']) == int(user)):
-                        if ((re.match(r'\d+$', msg['body'])) or re.match(r'((Д|д)а)|((Н|н)ет)', msg['body'])):
-
-                            if int(msg['date']) < int(args['date']):
-                                print('Дошел до старого сообщения')
-                                break
-
-                            ans = msg['body']
-                            return ans
-
-                except Exception as E:
-                    print('WMF exception ', E)
-                    continue
-        return None
 
     def Reply(self):
         while True:
@@ -232,17 +223,13 @@ class Bot:
             try:
                 self.UserApi.messages.send(**args)
                 self.Replyqueue.task_done()
-            except Exception as Ex:
-                print("error couldn't send message:", Ex)
-                try:
-                    args['message'] += '\nФлудконтроль:{}'.format(randint(0, 255))
-                except:
-                    args['message'] = '\nФлудконтроль:{}'.format(randint(0, 255))
+            except VKEX.VkAPIError as Ex:
+                sys.stderr.write('VkApi error - '+str(Ex))
                 self.Replyqueue.put(args)
 
     def generateConfig(self, path):
         token = input('User access token')
-        adminid = input('Admin vk id')
+        self.USERS.WriteUser(input('Admin ID'),self.USERS.Stats.admin,self.USERS.Actions.Add,'core.*','chat.*')
         data = {}
         with open(path + '/settings.json', 'w') as config:
             data['settings'] = {'UserAccess_token': token, "bannedCommands": {}}
@@ -274,7 +261,16 @@ class Bot:
     def GetUploadServer(self):
         return self.UserApi.photos.getMessagesUploadServer()
 
-    def UploadPhoto(self, urls):
+    def UploadPhoto(self, urls) ->list:
+        """
+
+        Args:
+            urls (list): list of strings ( urls )
+
+        Returns:
+            list: list of strings ( photo id )
+
+        """
         atts = []
 
         if type(urls) != type(['1', '2']):
@@ -296,8 +292,6 @@ class Bot:
             Tmp.rem()
 
             if req.status_code == requests.codes.ok:
-
-                photo = 'photo' + str(i)
                 try:
                     params = {'server': req.json()['server'], 'photo': req.json()['photo'], 'hash': req.json()['hash']}
                     photos = self.UserApi.photos.saveMessagesPhoto(**params)
@@ -307,7 +301,15 @@ class Bot:
                     continue
         return atts
 
-    def UploadFromDisk(self, file):
+    def UploadFromDisk(self, file) ->str:
+        """
+
+        Args:
+            file (str):path to file
+
+        Returns:
+            str:photo id
+        """
         try:
             self.Stat['cache'] = str(prettier_size((os.path.getsize(os.path.join(getpath(), 'tmp', 'cache.zip')))))
         except:
@@ -337,7 +339,15 @@ class Bot:
 
         return photo['id']
 
-    def UploadDocFromDisk(self, file):
+    def UploadDocFromDisk(self, file) -> str:
+        """
+
+        Args:
+            file (str):path to file
+
+        Returns:
+            str: doc id
+        """
         atts = []
         server = self.UserApi.docs.getUploadServer()['upload_url']
         args = {}
@@ -355,14 +365,12 @@ class Bot:
             return 'doc{}_{}'.format(doc['owner_id'], doc['id']), doc
         return None, None
 
-
-
     def ExecCommands(self):
 
         def process_fwd_msg(self, data):
             if 'fwd' in data['atts']:
                 try:
-                    atts = self.UserApi.messages.getById(v="5.60", message_ids=data['message_id'])['items'][0][
+                    atts = self.UserApi.messages.getById(v="5.60", message_ids=message.id)['items'][0][
                         'fwd_messages'][0]
                     print(atts)
                     if 'attachments' in atts:
@@ -380,64 +388,69 @@ class Bot:
 
             return data
 
-        def print_message(self, data):
+        from DataTypes.LongPoolUpdate import Updates
+
+        def print_message(self, data: LongPoolMessage, LongPoolData: Updates):
             # print_(data)
 
-            def process_attachments(atts, message_id):
+            def process_attachments(data:LongPoolMessage, LongPoolData: Updates):
                 fwdMessages = []
                 attachments = []
+                def process_FWD(fwds:list,depth = 1):
 
-                def process_FWD(fwds, depth=1):
                     for fwd in fwds:
-                        if 'fwd_messages' in fwd:
-                            process_FWD(fwd['fwd_messages'], depth + 1)
+                        #fwd = fwd_message()
+                        if fwd.hasFwd:
+                            process_FWD(fwd.fwd_messages,depth+1)
 
                         templateFWD = '|{}{} : \n|{}| {}\n'
-                        user = self.GetUserNameById(fwd['user_id'])
+                        try:
+                            try:
+                                Tuser = LongPoolData.GetUserProfile(fwd.user_id)
+                                Tusr = Tuser.first_name + ' ' + Tuser.last_name
+                                Tmsg = fwd.body.replace('<br>', '\n| ')
+                                fwdMessages.append(templateFWD.format('    ' * (fwd.depth), Tusr, ' ' + '    ' * (fwd.depth), Tmsg))
+                            except:
+                                Tuser = self.USERS.getCache(fwd.user_id)
+                                Tuser.first_name = Tuser['first_name']
+                                Tuser.last_name = Tuser['last_name']
+                                Tusr = Tuser.first_name + ' ' + Tuser.last_name
+                                Tmsg = fwd.body.replace('<br>', '\n| ')
+                                fwdMessages.append(templateFWD.format('    ' * (fwd.depth), Tusr, ' ' + '    ' * (fwd.depth), Tmsg))
+                        except:
+                            fwdMessages.append('ERROR')
+                            continue
 
-                        usr = user['first_name'] + ' ' + user['last_name']
 
-                        msg = fwd['body'].replace('<br>', '\n| ')
+                process_FWD(data.fwd_messages)
+                if data.hasAttachment:
+                    for t in data.attachments:
+                        if t.type == Attachment.types.photo:
+                            template_attach = "{} : {}"
+                            attachments.append(template_attach.format(t.type, t.photo))
 
-                        fwdMessages.append(templateFWD.format('    ' * depth, usr,' '+'    ' * depth, msg))
-
-                attach_reg = r'attach(?P<num>\d)_type'
-                for t in atts:
-                    if re.search(attach_reg, t):
-                        type_ = atts[t]
-                        num = re.search(attach_reg, t).group('num')
-                        photo = self.GetBiggesPic(atts['attach{}'.format(num)], message_id)
-                        sleep(0.25)
-                        template_attach = "{} : {}"
-                        attachments.append(template_attach.format(type_, photo))
-                if 'fwd' in atts:
-                    fwd = self.UserApi.messages.getById(v="5.60", message_ids=data['message_id'])['items'][0]
-
-                    process_FWD(fwd['fwd_messages'])
                 out = ''
                 out += ''.join(fwdMessages) if len(fwdMessages) > 0 else ''
                 out += '\n' if (len(fwdMessages) > 0) and (len(attachments) > 0) else ''
-                out += ('Attachments :\n ' + '\n'.join(attachments)) if len(attachments) > 0 else ""
+                out += ('Attachments :\n ' + '\n'.join(attachments[::-1])) if len(attachments) > 0 else ""
                 out += '\n' if len(attachments) > 0 else ''
                 return out
-            try:
-                user = self.GetUserNameById(data['user_id'])
 
+            try:
+                user = LongPoolData.GetUserProfile(data.user_id)
                 template = '{} : {} : \n| {}\n'
 
                 template2 = '[ message_id : {} | peer_id : {} ]\n'
 
-                subj = "PM" if "..." in data['subject'] else data['subject']
+                subj = "PM" if "..." in data.title else data.title
 
-                usr = user['first_name'] + ' ' + user['last_name']
+                usr = user.first_name + ' ' + user.last_name
 
-                msg = data['message'].replace('<br>', '\n| ')
-                try:
-                    attachments = process_attachments(data['atts'], data['message_id'])
-                except:
-                    attachments = []
-                toPrint = template.format(subj, usr, msg) + attachments + template2.format(str(data['message_id']), str(
-~                    data['peer_id'])) if self.DEBUG else '\n'
+                msg = data.body.replace('<br>', '\n| ')
+
+                attachments = process_attachments(data,LongPoolData)
+
+                toPrint = template.format(subj, usr, msg) + attachments + template2.format(message.id, message.chat_id) if self.DEBUG else '\n'
                 print(toPrint, type_='message')
                 self.log.write(toPrint)
                 self.log.flush()
@@ -453,156 +466,157 @@ class Bot:
                 pass
 
         while True:
-            data = self.Checkqueue.get()
-            sleep(0.3)
-            self.TRIGGERS.processTriggers(data)
-            self.Stat['messages'] = self.Stat['messages'] + 1
-            self.SaveConfig()
-            if self.AdminModeOnly:
-                if 0 <= self.USERS.GetStatusId(data['user_id']):
-                    continue
-            defargs = {"peer_id": data['peer_id'], "v": "5.60", "forward_messages": data['message_id']}
-            p = '[\U0001F600-\U0001F64F]|[\U0001F300-\U0001F5FF]|[\U0001F680-\U0001F6FF]|[\U0001F1E0-\U0001F1FF]'
-            emoji_pattern = re.compile(p, re.VERBOSE)
+            PvUpdates = self.Checkqueue.get()
+            for message in PvUpdates.messages:
+                if message.hasAction:
+                    self.SourceAct(message,PvUpdates)
+                sleep(0.3)
+                self.TRIGGERS.processTriggers(message)
+                self.Stat['messages'] += 1
+                self.SaveConfig()
+                if self.AdminModeOnly:
+                    if 0 <= self.USERS.GetStatusId(message.user_id):
+                        continue
+                defargs = {"peer_id": message.chat_id, "v": "5.60", "forward_messages": message.id}
+                p = '[\U0001F600-\U0001F64F]|[\U0001F300-\U0001F5FF]|[\U0001F680-\U0001F6FF]|[\U0001F1E0-\U0001F1FF]'
+                emoji_pattern = re.compile(p, re.VERBOSE)
 
-            data['message'] = emoji_pattern.sub('', data['message'])
-            print_message(self, data)
-            comm = data["message"]
-            comm = comm.split("<br>")
-            args = {}
-            temp = {}
-            for C in comm[1:]:
-                C = C.split(":")
-                temp[C[0].replace(" ", "").lower()] = ':'.join(C[1:])
-            args.update(data)
-            args["custom"] = temp
+                message.body = emoji_pattern.sub('', message.body)
+                print_message(self, message, PvUpdates)
+                comm = message.body
+                comm = comm.split("\n")
+                temp = {}
+                for C in comm[1:]:
+                    C = str(C)
+                    C = C.split(":")
+                    temp[C[0].replace(" ", "").lower()] = ':'.join(C[1:])
+                message.custom = temp
 
-            pattern = "{}, ?|{}, ?|{}, ?|{}, ?".format(self.MyName['first_name'].lower(), self.MyName['first_name'],
-                                                       'ред', "Ред")
-            Command = re.split(pattern, comm[0])[-1]
-            text = copy.deepcopy(Command)
+                pattern = "{}, ?|{}, ?|{}, ?|{}, ?".format(self.MyName['first_name'].lower(), self.MyName['first_name'],
+                                                           'ред', "Ред")
+                Command = str(re.split(pattern, comm[0])[-1])
+                text = copy.deepcopy(Command)
+                message.args = Command.split(' ')
+                if (message.body.lower().startswith(self.MyName['first_name'].lower())) or (
+                        message.body.lower().startswith('ред')):
 
-            if (data['message'].lower().startswith(self.MyName['first_name'].lower())) or (
-                    data['message'].lower().startswith('ред')):
+                    #data = process_fwd_msg(self, data,Updates)
 
-                data = process_fwd_msg(self, data)
+                    message.text = ' '.join(text.split(' ')[1:])
 
-                args["text"] = ' '.join(text.split(' ')[1:])
+                    Command = Command.split(' ')[0]
+                    if Command in self.Settings['bannedCommands']:
+                        if message.chat_id in self.Settings['bannedCommands'][Command]:
+                            self.Checkqueue.task_done()
+                            return
 
+                    if self.MODULES.isValid(Command):
+                        funk = self.MODULES.GetModule(Command)
+                        user = message.user_id
+                        if self.USERS.HasPerm(user, funk.perms) and self.MODULES.CanAfford(self.USERS.GetCurrency(user), Command):
+                            try:
+                                print("Trying to execute commnad {},\n arguments:{}".format(Command, message.custom))
+                                stat = funk.funk.execute(self, message, PvUpdates)
+                                self.USERS.pay(user, funk.cost)
+                                if stat == False:
+                                    defargs['message'] = 'Неправильно оформлен запрос. Пример запроса : {}'.format(
+                                        funk.template.format(self.MyName['first_name']))
+                                    self.Checkqueue.task_done()
+                                    self.Replyqueue.put(defargs)
+                                if stat == 'Error':
+                                    pass
+                                self.Checkqueue.task_done()
+                                self.Stat['commands'] += 1
+                                self.SaveConfig()
+                            except Exception as Ex:
 
-                Command = Command.split(' ')[0]
-                if Command in self.Settings['bannedCommands']:
-                    if str(args['peer_id']) in self.Settings['bannedCommands'][Command]:
-                        self.Checkqueue.task_done()
-                        return
+                                print(Ex.__traceback__)
+                                print(Ex.__cause__)
+                                sleep(1)
+                                if 'many requests per second' in str(Ex):
+                                    print('Too many requests per second')
+                                    # self.Checkqueue.put(data,timeout=5)
+                                    continue
 
-                if self.MODULES.isValid(Command):
-                    funk = self.MODULES.GetModule(Command)
-                    user = data["user_id"]
-                    if self.USERS.HasPerm(user, funk.perms) and self.MODULES.CanAfford(self.USERS.GetCurrency(user),
-                                                                                       Command):
-                        try:
-                            print("Trying to execute commnad {},\n arguments:{}".format(Command, args))
-                            stat = funk.funk.execute(self, args)
-                            self.USERS.pay(user, funk.cost)
-                            if stat == False:
-                                defargs['message'] = 'Неправильно оформлен запрос. Пример запроса : {}'.format(
-                                    funk.template.format(self.MyName['first_name']))
+                                exc_type, exc_value, exc_traceback = sys.exc_info()
+                                TB = traceback.format_tb(exc_traceback)
+
+                                defargs['message'] = "Не удалось выполнить, ошибка:{}\n {}\n {} \n {}".format(exc_type,
+                                                                                                              exc_value,
+                                                                                                              ''.join(
+                                                                                                                  TB),
+                                                                                                              "Перешлите это сообщение владельцу бота")
+                                print(defargs['message'])
+                                # self.Reply(self.UserApi, args)
                                 self.Checkqueue.task_done()
                                 self.Replyqueue.put(defargs)
-                            if stat == 'Error':
-                                pass
-                            self.Checkqueue.task_done()
-                            self.Stat['commands'] = self.Stat['commands'] + 1
-                            self.SaveConfig()
-                        except Exception as Ex:
-
-                            print(Ex.__traceback__)
-                            print(Ex.__cause__)
-                            sleep(1)
-                            if 'many requests per second' in str(Ex):
-                                print('Too many requests per second')
-                                # self.Checkqueue.put(data,timeout=5)
-                                continue
-
-                            exc_type, exc_value, exc_traceback = sys.exc_info()
-                            TB = traceback.format_tb(exc_traceback)
-
-                            defargs['message'] = "Не удалось выполнить, ошибка:{}\n {}\n {} \n {}".format(exc_type,
-                                                                                                          exc_value,
-                                                                                                          ''.join(TB),
-                                                                                                          "Перешлите это сообщение владельцу бота")
-                            print(defargs['message'])
-                            # self.Reply(self.UserApi, args)
+                        elif not self.MODULES.CanAfford(self.USERS.GetCurrency(user), Command):
+                            defargs["message"] = "Нехватает валюты. Попробуйте обратиться к администрации"
                             self.Checkqueue.task_done()
                             self.Replyqueue.put(defargs)
-                    elif not self.MODULES.CanAfford(self.USERS.GetCurrency(user), Command):
-                        defargs["message"] = "Нехватает валюты. Попробуйте обратиться к администрации"
-                        self.Checkqueue.task_done()
-                        self.Replyqueue.put(defargs)
 
+
+                        else:
+                            print('"Недостаточно прав"')
+                            defargs["message"] = "Недостаточно прав"
+                            self.Checkqueue.task_done()
+                            self.Replyqueue.put(defargs)
 
                     else:
-                        print('"Недостаточно прав"')
-                        defargs["message"] = "Недостаточно прав"
+                        ans = self.Responder.respond(str(message.body), message.chat_id)
+                        if ans == "":
+                            continue
+                        if ans == "IT'S HIGH NOON":
+                            att = self.UploadFromDisk(choice([self.GetImg('Noon1.jpg'), self.GetImg('Noon2.jpg')]))
+                            defargs['attachment'] = att
+                        defargs['message'] = ans
                         self.Checkqueue.task_done()
                         self.Replyqueue.put(defargs)
 
-                else:
-                    ans = self.Responder.respond(str(data['message']), args['user_id'])
-                    if ans == "":
-                        continue
-                    if ans == "IT'S HIGH NOON":
+    def SourceAct(self,data:LongPoolMessage,LongPoolUpdate:Updates):
+        """
 
-                        att = self.UploadFromDisk(choice([self.GetImg('Noon1.jpg'), self.GetImg('Noon2.jpg')]))
-                        defargs['attachment'] = att
-                    defargs['message'] = ans
-                    self.Checkqueue.task_done()
-                    self.Replyqueue.put(defargs)
-
-
-
-
-    def SourceAct(self, type, data, MSData):
+        Args:
+            data (LongPoolMessage): Message
+            LongPoolUpdate (LongPoolUpdate): Updates
+        """
         print('Что то с Актом пришло')
-        Targs = {"peer_id": MSData['peer_id'], "v": "5.60"}
+        Targs = {"peer_id": data.chat_id, "v": "5.60"}
         if type == 'chat_photo_update':
-            ChatAdmin = self.UserApi.messages.getChat(chat_id=MSData['peer_id'] - 2000000000)['admin_id']
+            ChatAdmin = data.admin_id
             if int(ChatAdmin) != int(self.MyUId):
                 return
-            if int(data['from']) == int(self.MyUId):
+            if int(data.user_id) == int(self.MyUId):
                 return
-            img = Image.open(os.path.join(self.IMAGES,'CHAT_IMG.jpg'))
-            tmpf = {'chat_id': int(MSData['peer_id']) - 2000000000, "crop_x": ((img.size[0] - 350) / 2),
+            img = Image.open(os.path.join(self.IMAGES, 'CHAT_IMG.jpg'))
+            tmpf = {'chat_id': int(data.chat_id) - 2000000000, "crop_x": ((img.size[0] - 350) / 2),
                     'crop_y': (((img.size[1] - 350) / 2) - 30), 'crop_width': 350}
             Uurl = self.UserApi.photos.getChatUploadServer(**tmpf)
             req = requests.post(Uurl['upload_url'], files={'file1': open(self.GetImg('CHAT_IMG.jpg'), 'rb')})
             self.UserApi.messages.setChatPhoto(**{'file': req.json()['response']})
 
-        if type == 'chat_title_update':
-            who = data['from']
-            if self.USERS.HasPerm(who, 'chat.title'):
-                if int(data['from']) == int(self.MyUId):
-                    return
-                if data['source_old_text'] != data['source_text']:
-                    if MSData['peer_id'] in self.Settings['namelock']:
-
-                        self.UserApi.messages.editChat(chat_id=MSData['peer_id'] - 2000000000,
-                                                       title=data['source_old_text'], v='5.60')
-
-                        Targs['message'] = 'Название беседы менять запрещено'
-                        self.Replyqueue.put(Targs)
-                    else:
-                        pass
-                else:
-                    pass
+        #if type == 'chat_title_update':
+        #    who = data.user_id
+        #    if self.USERS.HasPerm(who, 'chat.title'):
+        #        if int(data.user_id) == int(self.MyUId):
+        #            return
+        #        if data.action. != data['source_text']:
+        #            if data.chat_id in self.Settings['namelock']:
+        #                self.UserApi.messages.editChat(chat_id=data.chat_id - 2000000000,
+        #                                               title=data['source_old_text'], v='5.60')
+        #                Targs['message'] = 'Название беседы менять запрещено'
+        #                self.Replyqueue.put(Targs)
+        #            else:
+        #                pass
+        #        else:
+        #            pass
 
         if type == 'chat_invite_user':
-            ChatAdmin = self.UserApi.messages.getChat(chat_id=MSData['peer_id'] - 2000000000)['admin_id']
+            ChatAdmin = data.admin_id
             if int(ChatAdmin) != self.MyUId:
                 return
-            who = data['from']  # Кто пригласил
-            target = data['source_mid']  # Кого пригласил
+            who = data.user_id  # Кто пригласил
+            target = data.action.action_mid  # Кого пригласил
 
             if int(target) == self.MyUId or int(who) == self.MyUId:
                 print('Сам себя')
@@ -613,22 +627,20 @@ class Bot:
                 name = self.GetUserNameById(int(target))
                 Targs['message'] = "The kickHammer has spoken.\n {} has been kicked in the ass".format(
                     ' '.join([name['first_name'], name['last_name']]))
-                self.UserApi.messages.removeChatUser(v=5.45, chat_id=MSData['peer_id'] - 2000000000, user_id=target)
+                self.UserApi.messages.removeChatUser(v=5.45, chat_id=data.chat_id - 2000000000, user_id=target)
 
             else:
                 print('Приглашен администрацией')
         if type == 'chat_kick_user':
-            if int(data['from']) == int(self.MyUId):
+            if int(data.user_id) == int(self.MyUId):
                 return
 
-
-
-            if int(data['from']) == int(data['source_mid']):
-                user = self.GetUserNameById(data['source_mid'])
+            if int(data.user_id) == int(data.action.action_mid):
+                user = self.GetUserNameById(data.action.action_mid)
                 print(user)
                 try:
                     sex = user['sex']
-                    if sex ==2:
+                    if sex == 2:
                         end = ''
                     if sex == 1:
                         end = 'а'
@@ -636,91 +648,65 @@ class Bot:
                         end = 'о'
                 except:
                     end = 'о'
-                Targs['message'] = 'Оп, {} {} ливнул{} с подливой &#9786;'.format(user['first_name'], user['last_name'], end)
+                Targs['message'] = 'Оп, {} {} ливнул{} с подливой &#9786;'.format(user['first_name'], user['last_name'],
+                                                                                  end)
             else:
-                user = self.GetUserNameById(data['source_mid'],case = 'acc')
+                user = self.GetUserNameById(data.action.action_mid, case='acc')
                 Targs['message'] = 'Оп, {} {} кикнули &#127770;'.format(user['first_name'], user['last_name'])
             self.Replyqueue.put(Targs)
 
-    def GetBiggesPic(self, att, mid=0):
-        try:
-            data = self.UserApi.photos.getById(photos=att, v=5.60)[0]
-            # print('using GBI')
-        except:
 
-            #print('using MID')
-            data = self.UserApi.messages.getById(message_ids=mid, v=5.60)
-            #print('mid data', data)
-            data = data['items']
-            #print('mid items', data)
-            data = data[0]
-            #print('mid 0', data)
-            if 'attachments' not in data:
-                data = data['fwd_messages'][0]['attachments']
-            else:
-                data = data['attachments']
-            #print('mid atts', data)
-            # self.LOG('log',sys._getframe().f_code.co_name, 'mid data', data)
-            for i in data:
-                #print("[MID]", i)
-                if i['type'] == 'photo' and (int(i['photo']['id']) == int(att.split('_')[1])):
-                    key = i['photo']['access_key']
-                    data = self.UserApi.photos.getById(photos=att, v=5.57, access_key=key)[0]
-
-        #print(data)
-        sizes = re.findall(r'(?P<photo>photo_\d+)', str(data))
-        #print(sizes)
-        sizesToSort = {int(size.split('_')[1]): size for size in sizes}
-
-        sizesSorted = sorted(sizesToSort, reverse=True)[0]
-        size = data[sizesToSort[sizesSorted]]
-        return data[sizesToSort[sizesSorted]]
-    def ContiniousMessageCheck(self,server = ""):
+    def ContiniousMessageCheck(self, server=""):
+        ts = 0
+        key = 0
         while True:
-            if (server == ''):
-                results = self.UserApi.messages.getLongPollServer()
-                server = results['server']
-                key = results['key']
-                ts = results['ts']
-                print(ts)
-            url = 'https://{}?act=a_check&key={}&ts={}&wait=25&mode=2&version=1'
-            try:
-                req = requests.request('GET',url.format(server,key,ts)).json()
 
-            except Exception:
+            try:
+                if (server == ''):
+                    results = self.UserApi.messages.getLongPollServer()
+                    server = results['server']
+                    key = results['key']
+                    ts = results['ts']
+
+                url = 'https://{}?act=a_check&key={}&ts={}&wait=25&mode=2&version=1'
+                try:
+                    req = requests.request('GET', url.format(server, key, ts)).json()
+
+                except Exception:
+                    print('TIMEOUT ERROR, reconnecting in 5 seconds')
+                    sleep(5)
+                    server = ""
+                    ts = ""
+                    key = ""
+                    continue
+                if len(req['updates']) > 0:
+                    hasMsg = False
+                    for upd in req['updates']:
+                        if 4 == upd[0]:
+                            hasMsg = True
+                    if hasMsg:
+                        self.parseLongPoolHistory(ts)
+                        ts = req['ts']
+            except:
                 print('TIMEOUT ERROR, reconnecting in 5 seconds')
                 sleep(5)
                 server = ""
                 ts = ""
                 key = ""
-                continue
-            if len(req['updates'])>0:
-                hasMsg = False
-                for upd in req['updates']:
-                    if 4 == upd[0]:
-                        hasMsg = True
-                if hasMsg:
-                    self.parseLongPoolHistory(ts)
-                    print(ts,req['ts'])
-                    ts = req['ts']
 
-
-    def parseLongPoolHistory(self,ts):
-        print(ts)
-        resp = self.UserApi.messages.getLongPollHistory(ts = ts,v='5.63',fields = 'photo,photo_medium_rec,sex,online,screen_name',)
+    def parseLongPoolHistory(self, ts):
+        resp = self.UserApi.messages.getLongPollHistory(ts=ts, v='5.63',
+                                                        fields='photo,photo_medium_rec,sex,online,screen_name', )
         try:
             updates = FillUpdates(resp)
         except:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             TB = traceback.format_tb(exc_traceback)
-            print('except',resp)
-            print_(exc_type)
-            print_(exc_value)
-            print_('\n','\n'.join(TB))
-        print(str(updates.messages[0]))
-        return
-
-
+            print(exc_type)
+            print(exc_value)
+            print('\n', '\n'.join(TB))
+        #print('\n', '\n'.join([str(m) for m in updates.messages]))
+        self.Checkqueue.put(updates)
 
 
 if __name__ == "__main__":
