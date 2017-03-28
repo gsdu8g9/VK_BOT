@@ -37,11 +37,11 @@ class Command_WantedFunk(C_template):
             return False
         try:
 
-            photo = atts[0].photo.photo
+            photo = atts[0].photo._getbiggest()
         except:
             return False
         try:
-            photo1 = atts[1].photo.photo
+            photo1 = atts[1].photo._getbiggest()
         except:
             return False
         req = urllib.request.Request(photo, headers=HDR)
@@ -74,7 +74,7 @@ class Command_JonTronFunk(C_template):
 
         try:
 
-            photo = atts[0].photo.photo
+            photo = atts[0].photo._getbiggest()
             req = urllib.request.Request(photo, headers=HDR)
 
             img = urlopen(req).read()
@@ -118,7 +118,7 @@ class Command_SayMaxFunk(C_template):
 
         try:
 
-            photo = atts[0].photo.photo
+            photo = atts[0].photo._getbiggest()
             req = urllib.request.Request(photo, headers=HDR)
 
             img = urlopen(req).read()

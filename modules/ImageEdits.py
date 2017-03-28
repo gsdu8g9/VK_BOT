@@ -3,7 +3,7 @@ import re
 import urllib
 from urllib.request import urlopen
 
-from DataTypes.LongPoolUpdate import Attachment
+from DataTypes.attachments import attachment
 from trigger import Trigger
 
 try:
@@ -44,8 +44,8 @@ class Command_Kok(C_template):
         args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
         try:
             att = data.attachments[0]
-            if att.type == Attachment.types.photo:
-                photo = att.photo.photo
+            if att.type == attachment.types.photo:
+                photo = att.photo._getbiggest()
         except:
             return False
         req = urllib.request.Request(photo, headers=HDR)
@@ -69,8 +69,8 @@ class Command_Kek(C_template):
         args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
         try:
             att = data.attachments[0]
-            if att.type == Attachment.types.photo:
-                photo = att.photo.photo
+            if att.type == attachment.types.photo:
+                photo = att.photo._getbiggest()
         except:
             return False
         req = urllib.request.Request(photo, headers=HDR)
@@ -95,8 +95,8 @@ class Command_Filter(C_template):
         args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
         try:
             att = data.attachments[0]
-            if att.type == Attachment.types.photo:
-                photo = att.photo.photo
+            if att.type == attachment.types.photo:
+                photo = att.photo._getbiggest()
         except:
             return False
         req = urllib.request.Request(photo, headers=HDR)
@@ -153,7 +153,7 @@ class Command_Resize(C_template):
         Topost = []
         for att in data.attachments:
             try:
-                photo = att.photo.photo
+                photo = att.photo._getbiggest()
             except:
                 return False
             req = urllib.request.Request(photo, headers=HDR)
@@ -277,7 +277,7 @@ class Command_rollRows(C_template):
         Topost = []
         for att in data.attachments:
             try:
-                photo = att.photo.photo
+                photo = att.photo._getbiggest()
             except:
                 return False
 
@@ -307,7 +307,7 @@ class Command_rollRowssmart(C_template):
         Topost = []
         for att in data.attachments:
             try:
-                photo = att.photo.photo
+                photo = att.photo._getbiggest()
             except:
                 return False
 
@@ -341,11 +341,11 @@ class Command_AddImages(C_template):
 
         try:
 
-            photo =atts[0].photo.photo
+            photo =atts[0].photo._getbiggest()
         except:
             return False
         try:
-            photo1 = atts[1].photo.photo
+            photo1 = atts[1].photo._getbiggest()
         except:
             return False
         req = urllib.request.Request(photo, headers=HDR)
@@ -382,11 +382,11 @@ class Command_merge(C_template):
 
         try:
 
-            photo =atts[0].photo.photo
+            photo =atts[0].photo._getbiggest()
         except:
             return False
         try:
-            photo1 = atts[1].photo.photo
+            photo1 = atts[1].photo._getbiggest()
         except:
             return False
         req = urllib.request.Request(photo, headers=HDR)
@@ -438,7 +438,7 @@ class Command_GlitchImg(C_template):
 
         for att in data.attachments:
             try:
-                photo = att.photo.photo
+                photo = att.photo._getbiggest()
             except:
                 return False
             req = urllib.request.Request(photo, headers=HDR)
@@ -463,7 +463,7 @@ class Command_everyPixel(C_template):
     def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
         args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
         att = data.attachments[0]
-        photo = att.photo.photo
+        photo = att.photo._getbiggest()
         tags, quality = EveryPixel.GetTags(photo)
         tags_template = 'Я вижу тут:\n{}\n'
         tags_msg = tags_template.format('\n'.join(tags))

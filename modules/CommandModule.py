@@ -77,14 +77,12 @@ class Command_Whom(C_template):
             args['message'] = "Тебя"
             return args
         else:
-            users = data.chat_active
             toinf = text.split(" ")
             toins = ""
-            user = random.choice(users)
-            ud = LongPoolUpdates.GetUserProfile(user).sex
-            if ud == 2:
+            ud = LongPoolUpdates.GetUserProfile(random.choice(data.chat_active))
+            if ud.sex == 2:
                 userGender = "masc"
-            elif ud == 1:
+            elif ud.sex == 1:
                 userGender = "femn"
             else:
                 userGender = "neut"
@@ -107,10 +105,10 @@ class Command_Whom(C_template):
                 else:
                     toins += "{} ".format(wrd)
 
-            if user['id'] == bot.MyUId:
+            if ud.id == bot.MyUId:
                 args['message'] = 'Определённо меня'
                 bot.Replyqueue.put(args)
-            name = '*id{} ({} {})'.format(str(user['id']), user['first_name'], user['last_name'])
+            name = '*id{} ({} {})'.format(str(ud.id), ud.first_name_acc, ud.last_name_acc)
             replies = ["Определённо {}", "Точно {}", "Я уверен что его -  {}"]
             msg = random.choice(replies)
             args['message'] = msg.format(name)
@@ -131,7 +129,7 @@ class Command_Who(C_template):
 
         Args:
             forward (bool):
-            Updates (Updates):
+            LongPoolUpdates (Updates):
             data (LongPoolMessage):
             bot (Vk_bot2.bot):
         """
@@ -151,10 +149,7 @@ class Command_Who(C_template):
             bot.Replyqueue.put(args)
             return True
         else:
-            users = data.chat_active
-
-            user = random.choice(users)
-            ud = LongPoolUpdates.GetUserProfile(user).sex
+            ud = LongPoolUpdates.GetUserProfile(random.choice(data.chat_active))
             if ud == 2:
                 userGender = "masc"
             elif ud == 1:
@@ -187,15 +182,15 @@ class Command_Who(C_template):
                 except:
                     toins += "{} ".format(wrd)
             replies = ["Определённо {} {}", "Точно {} {}", "Я уверен что {} {}"]
-            if user['id'] == data.user_id:
+            if ud.id == data.user_id:
                 args['message'] = "Ты {}".format(toins.replace("тебе", "себе"))
                 bot.Replyqueue.put(args)
                 return True
-            if user['id'] == bot.MyUId:
+            if ud.id == bot.MyUId:
                 args['message'] = 'Определённо Я'
                 bot.Replyqueue.put(args)
                 return True
-            name = '*id{} ({} {})'.format(str(user['id']), user['first_name'], user['last_name'])
+            name = '*id{} ({} {})'.format(str(ud.id), ud.first_name_nom, ud.last_name_nom)
 
             msg = random.choice(replies)
             args['message'] = msg.format(name, toins)
@@ -256,11 +251,11 @@ def execute(bot: Vk_bot2.Bot, data: LongPoolMessage, LongPoolUpdates: Updates, f
     args = {"peer_id": data.chat_id, "v": "5.60", }
     if forward:
         args.update({"forward_messages": data.id})
-    user = LongPoolUpdates.GetUserProfile(data.user_id)
+    usr = LongPoolUpdates.GetUserProfile(data.user_id)
     try:
-        if user.sex == 2:
+        if usr.sex == 2:
             replies = ["Сам ты {}", "Сам ты {}", "Сам ты {}", "Сам такой"]
-        elif user.sex == 1:
+        elif usr.sex == 1:
             replies = ["Сама ты {}", "Сама ты {}", "Сама ты {}", "Сама такая"]
         else:
             replies = ["Само ты {}", "Само ты {}", "Само ты {}", "Само такое"]
@@ -901,26 +896,25 @@ class Command_Whois(C_template):
         if forward:
             args.update({"forward_messages": data.id})
         bb = data.text.split(' ')
-        user = bb[0]
 
         try:
-            userperms = bot.USERS.GetPerms(user)
-            userstatus = bot.USERS.GetStatus(user)
+            userperms = bot.USERS.GetPerms(bb[0])
+            userstatus = bot.USERS.GetStatus(bb[0])
         except:
             userperms = "Не зарегестрирован"
             userstatus = "Не зарегестрирован"
 
         try:
-            UD = VK_foaf.GetUser(user)
+            UD = VK_foaf.GetUser(bb[0])
         except:
             UD = {}
             UD['reg'] = "ОШИБКА"
             UD['Bday'] = "ОШИБКА"
             UD['gender'] = "ОШИБКА"
-        userName = bot.GetUserNameById(user)
+        userName = bot.GetUserNameById(int(bb[0]))
 
         msg_template = "Cтатус пользователя - {}\nЕго ФИО - {} {}\nЕго права :\n{}\nЗарегистрирован {}\nДень рождения {}\n пол {}\n"
-        msg = msg_template.format(userstatus, userName['first_name'], userName['last_name'],
+        msg = msg_template.format(userstatus, userName.first_name, userName.last_name,
                                   ',\n'.join(userperms) if isinstance(userperms, list) else userperms, UD['reg'],
                                   UD['Bday'], UD['gender'])
         args['message'] = msg

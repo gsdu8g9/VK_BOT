@@ -1,4 +1,6 @@
-from DataTypes.Attachments import *
+from DataTypes.attachments import attachment
+from DataTypes.user import user
+from DataTypes.photo import photo
 class action:
     class types:
         chat_kick_user = 'chat_kick_user'
@@ -34,6 +36,7 @@ class LongPoolMessage:
         self.action = action
         self.hasAction = False
         self.fwd_messages = []
+        self.hasFwd = False
         self.users_count = 0
         self.admin_id = 0
         self.custom = {}
@@ -48,25 +51,6 @@ class LongPoolMessage:
     def AsDict(self):
         return {var: vars(self)[var] for var in vars(self)}
         # source_act = Source_act
-
-
-class profile:
-    def __init__(self):
-        self.id = 0
-        self.first_name = ''
-        self.last_name = ''
-        self.sex = 0
-        self.screen_name = ''
-        self.online = 0
-        self.online_app = 0
-        self.online_mobile = 0
-
-    def __str__(self):
-        return str(dict({var: str(vars(self)[var]) for var in vars(self)}))
-
-    def AsDict(self):
-        return {var: vars(self)[var] for var in vars(self)}
-
 
 class chat:
     def __init__(self):
@@ -91,14 +75,14 @@ class Updates:
         self.chats = []
         self.new_pts = 0
 
-    def GetUserProfile(self, id: int) -> profile:
+    def GetUserProfile(self, id: int) -> user:
         """
 
         Args:
             id (int): User ID
 
         Returns:
-            profile
+            user
         """
         for user in self.profiles:
             if user.id == id:
@@ -130,7 +114,9 @@ class fwd_message:
         self.body = ''
         self.fwd_messages = []
         self.hasFwd = False
+        self.hasAttachment = False
         self.depth = 1
+        self.attachments = []
     def __str__(self):
         return str(dict({var: str(vars(self)[var]) for var in vars(self)}))
 
@@ -147,6 +133,15 @@ def FillUpdates(resp) -> Updates:
         tFwd.user_id = fwd['user_id']
         tFwd.date = fwd['date']
         tFwd.body = fwd['body']
+        if 'attachments' in fwd:
+            tFwd.hasAttachment = True
+            for att in fwd['attachments']:
+                    fAttachment = attachment()
+                    fAttachment.type = att['type']
+                    if fAttachment.type == attachment.types.photo:
+                        fPhoto = photo.Fill(att['photo'])
+                        fAttachment.photo = fPhoto
+                    tFwd.attachments.append(fAttachment)
         tFwd.depth = depth
         if 'fwd_messages' in fwd:
             tFwd.hasFwd = True
@@ -164,27 +159,16 @@ def FillUpdates(resp) -> Updates:
         tMessage.body = message['body']
         if 'attachments' in message:
             tMessage.hasAttachment = True
-            for attachment in message['attachments']:
-                    tAttachment = Attachment()
-                    tAttachment.type = attachment['type']
-                    if tAttachment.type == Attachment.types.photo:
-                        photo  = attachment['photo']
-                        tPhoto = Attachment.Photo()
-                        tPhoto.access_key = photo['access_key']
-                        tPhoto.id = photo['id']
-                        tPhoto.album_id = photo['album_id']
-                        tPhoto.owner_id = photo['owner_id']
-                        size = 0
-                        for ph in photo:
-                            if ph.startswith('photo'):
-                                t = ph.split('_')[-1]
-                                if size < int(t):
-                                    size = int(t)
-                        tPhoto.photo = photo['photo_{}'.format(size)]
+            for att in message['attachments']:
+                    tAttachment = attachment()
+                    tAttachment.type = att['type']
+                    if tAttachment.type == attachment.types.photo:
+                        tPhoto = photo.Fill(att['photo'])
                         tAttachment.photo = tPhoto
                     tMessage.attachments.append(tAttachment)
 
         if 'fwd_messages' in message:
+            tMessage.hasFwd = True
             for fwd in message['fwd_messages']:
                 tMessage.fwd_messages.append(RecirsionFwd(fwd))
         try:
@@ -193,6 +177,7 @@ def FillUpdates(resp) -> Updates:
             tMessage.users_count = message['users_count']
             tMessage.admin_id = message['admin_id']
             tMessage.isChat = True
+
         except:
             tMessage.chat_id = message['user_id']
             tMessage.chat_active = [message['user_id']]
@@ -213,18 +198,8 @@ def FillUpdates(resp) -> Updates:
 
         a.messages.append(tMessage)
         for Userprofile in resp['profiles']:
-            tProfile = profile()
-            tProfile.id = Userprofile['id']
-            tProfile.first_name = Userprofile['first_name']
-            tProfile.last_name = Userprofile['last_name']
-            if 'sex' in Userprofile:
-                tProfile.sex = Userprofile['sex']
-            tProfile.screen_name = Userprofile['screen_name']
-            tProfile.online = Userprofile['online']
-            if 'online_app' in Userprofile:
-                tProfile.online_app = Userprofile['online_app']
-            if 'online_mobile' in Userprofile:
-                tProfile.online_mobile = Userprofile['online_mobile']
+            tProfile = user.Fill(Userprofile)
+
             a.profiles.append(tProfile)
         try:
             for c in resp['chats']:

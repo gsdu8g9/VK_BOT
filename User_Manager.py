@@ -198,7 +198,8 @@ class UserManager:
         else:
             self.WriteUser(user, Status.user)
             return self.isCached(user)
-    def getCache(self,user):
+    def getCache(self,user:str):
+        user = str(user)
         return self.DB[user][UserManager.cache]
 if __name__ == "__main__":
     a = UserManager()

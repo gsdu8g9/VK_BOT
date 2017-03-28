@@ -2,27 +2,25 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8e8d7c2a-d8a5-4bd1-9412-f3862de24023" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/updater.py" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DataTypes/City.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DataTypes/User.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DataTypes/career.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DataTypes/contacts.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DataTypes/counters.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DataTypes/country.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DataTypes/crop_photo.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DataTypes/doc.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DataTypes/last_seen.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/DataTypes/photo.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Vk_bot.py" afterPath="$PROJECT_DIR$/Vk_bot.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DataTypes/Attachments.py" afterPath="$PROJECT_DIR$/DataTypes/Attachments.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DataTypes/LongPoolUpdate.py" afterPath="$PROJECT_DIR$/DataTypes/LongPoolUpdate.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/User_Manager.py" afterPath="$PROJECT_DIR$/User_Manager.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Vk_bot2.py" afterPath="$PROJECT_DIR$/Vk_bot2.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/CommandModule.py" afterPath="$PROJECT_DIR$/modules/CommandModule.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/ImageEdits.py" afterPath="$PROJECT_DIR$/modules/ImageEdits.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/OpenCV.py" afterPath="$PROJECT_DIR$/modules/OpenCV.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modules/PIL_commands.py" afterPath="$PROJECT_DIR$/modules/PIL_commands.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/AIML_module.py" afterPath="$PROJECT_DIR$/libs/AIML_module.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/DA_Api.py" afterPath="$PROJECT_DIR$/libs/DA_Api.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/EveryPixel.py" afterPath="$PROJECT_DIR$/libs/EveryPixel.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/GlitchLib.py" afterPath="$PROJECT_DIR$/libs/GlitchLib.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Mimimi_Api.py" afterPath="$PROJECT_DIR$/libs/Mimimi_Api.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/PIL_module.py" afterPath="$PROJECT_DIR$/libs/PIL_module.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/VK_foaf.py" afterPath="$PROJECT_DIR$/libs/VK_foaf.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Vk_bot_RssModule.py" afterPath="$PROJECT_DIR$/libs/Vk_bot_RssModule.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/YT_Api.py" afterPath="$PROJECT_DIR$/libs/YT_Api.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/e621_Api.py" afterPath="$PROJECT_DIR$/libs/e621_Api.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/filters.py" afterPath="$PROJECT_DIR$/libs/filters.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/prismsort.py" afterPath="$PROJECT_DIR$/libs/prismsort.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tempfile_.py" afterPath="$PROJECT_DIR$/libs/tempfile_.py" />
     </list>
     <ignored path="VK_BOT.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -43,7 +41,7 @@
     <SUITE FILE_PATH="coverage/VK_BOT$VK_bot_GUI.coverage" NAME="VK_bot_GUI Coverage Results" MODIFIED="1471951096815" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/VK_BOT$test.coverage" NAME="test Coverage Results" MODIFIED="1477151531058" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/VK_BOT$FilterModule.coverage" NAME="FilterModule Coverage Results" MODIFIED="1488929596044" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modules" />
-    <SUITE FILE_PATH="coverage/VK_BOT$Vk_bot2.coverage" NAME="Vk_bot2 Coverage Results" MODIFIED="1490561448177" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/VK_BOT$Vk_bot2.coverage" NAME="Vk_bot2 Coverage Results" MODIFIED="1490689845292" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/VK_BOT$AIML_module.coverage" NAME="AIML_module Coverage Results" MODIFIED="1484405348900" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/VK_BOT$Serialiser.coverage" NAME="Serialiser Coverage Results" MODIFIED="1487956021816" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/VK_BOT$php.coverage" NAME="php Coverage Results" MODIFIED="1477000360859" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -95,7 +93,19 @@
         <entry file="file://$PROJECT_DIR$/Vk_bot2.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="432" column="0" selection-start-line="432" selection-start-column="0" selection-end-line="432" selection-end-column="0" />
+              <caret line="411" column="39" selection-start-line="411" selection-start-column="39" selection-end-line="411" selection-end-column="39" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Currency.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/modules/Currency.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="87" column="51" selection-start-line="87" selection-start-column="51" selection-end-line="87" selection-end-column="51" />
               <folding />
             </state>
           </provider>
@@ -105,7 +115,7 @@
         <entry file="file://$PROJECT_DIR$/modules/ImageEdits.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="387" column="12" selection-start-line="387" selection-start-column="12" selection-end-line="387" selection-end-column="12" />
+              <caret line="351" column="44" selection-start-line="351" selection-start-column="38" selection-end-line="351" selection-end-column="44" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -113,13 +123,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Serialiser.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Serialiser.py">
+      <file leaf-file-name="attachments.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/DataTypes/attachments.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.29799107">
-              <caret line="53" column="23" selection-start-line="53" selection-start-column="23" selection-end-line="53" selection-end-column="23" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="21" column="22" selection-start-line="21" selection-start-column="22" selection-end-line="21" selection-end-column="22" />
               <folding>
-                <element signature="e#0#9#0" expanded="true" />
+                <element signature="e#0#33#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -129,59 +139,19 @@
         <entry file="file://$PROJECT_DIR$/DataTypes/LongPoolUpdate.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="211" column="37" selection-start-line="211" selection-start-column="37" selection-end-line="211" selection-end-column="37" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CommandModule.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/modules/CommandModule.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="937" column="61" selection-start-line="937" selection-start-column="61" selection-end-line="937" selection-end-column="61" />
+              <caret line="133" column="31" selection-start-line="133" selection-start-column="31" selection-end-line="133" selection-end-column="31" />
               <folding>
-                <marker date="1490605012803" expanded="true" signature="0:242" placeholder="import ..." />
+                <element signature="e#0#44#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Attachments.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/DataTypes/Attachments.py">
+      <file leaf-file-name="photo.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/DataTypes/photo.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="44" column="36" selection-start-line="44" selection-start-column="36" selection-end-line="44" selection-end-column="36" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="User_Manager.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/User_Manager.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="32" column="20" selection-start-line="32" selection-start-column="20" selection-end-line="32" selection-end-column="20" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="trigger.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/trigger.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="36" column="63" selection-start-line="36" selection-start-column="63" selection-end-line="36" selection-end-column="63" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Users.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Users.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="140" column="6" selection-start-line="140" selection-start-column="6" selection-end-line="140" selection-end-column="6" />
+            <state vertical-scroll-proportion="0.43589744">
+              <caret line="23" column="21" selection-start-line="23" selection-start-column="21" selection-end-line="23" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -219,20 +189,33 @@
         <option value="$PROJECT_DIR$/e621_Api.py" />
         <option value="$PROJECT_DIR$/trigger.py" />
         <option value="$PROJECT_DIR$/Users.json" />
-        <option value="$PROJECT_DIR$/User_Manager.py" />
         <option value="$PROJECT_DIR$/DataTypes/res.txt" />
-        <option value="$PROJECT_DIR$/modules/CommandModule.py" />
         <option value="$PROJECT_DIR$/modules/Berry.py" />
         <option value="$PROJECT_DIR$/modules/__Command_template.py" />
         <option value="$PROJECT_DIR$/modules/Currency.py" />
         <option value="$PROJECT_DIR$/modules/Permissions.py" />
-        <option value="$PROJECT_DIR$/modules/OpenCV.py" />
-        <option value="$PROJECT_DIR$/modules/PIL_commands.py" />
-        <option value="$PROJECT_DIR$/DataTypes/res.json" />
+        <option value="$PROJECT_DIR$/DataTypes/City.py" />
+        <option value="$PROJECT_DIR$/DataTypes/doc.py" />
         <option value="$PROJECT_DIR$/DataTypes/Attachments.py" />
+        <option value="$PROJECT_DIR$/DataTypes/country.py" />
+        <option value="$PROJECT_DIR$/DataTypes/counters.py" />
+        <option value="$PROJECT_DIR$/DataTypes/contacts.py" />
+        <option value="$PROJECT_DIR$/DataTypes/career.py" />
+        <option value="$PROJECT_DIR$/DataTypes/city.py" />
+        <option value="$PROJECT_DIR$/DataTypes/User.py" />
+        <option value="$PROJECT_DIR$/User_Manager.py" />
+        <option value="$PROJECT_DIR$/DataTypes/res.json" />
+        <option value="$PROJECT_DIR$/DataTypes/user.py" />
+        <option value="$PROJECT_DIR$/modules/CommandModule.py" />
+        <option value="$PROJECT_DIR$/DataTypes/last_seen.py" />
+        <option value="$PROJECT_DIR$/DataTypes/crop_photo.py" />
         <option value="$PROJECT_DIR$/DataTypes/LongPoolUpdate.py" />
+        <option value="$PROJECT_DIR$/DataTypes/attachments.py" />
         <option value="$PROJECT_DIR$/Vk_bot2.py" />
+        <option value="$PROJECT_DIR$/modules/PIL_commands.py" />
+        <option value="$PROJECT_DIR$/modules/OpenCV.py" />
         <option value="$PROJECT_DIR$/modules/ImageEdits.py" />
+        <option value="$PROJECT_DIR$/DataTypes/photo.py" />
       </list>
     </option>
   </component>
@@ -306,6 +289,52 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="VK_BOT" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Vk_bot2.py" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyFileNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="VK_BOT" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="VK_BOT" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Vk_bot2.py" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyFileNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Bot" />
+              <option name="myItemType" value="com.jetbrains.python.projectView.PyElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="VK_BOT" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="VK_BOT" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="VK_BOT" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="VK_BOT" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="modules" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -682,12 +711,6 @@
       <option name="number" value="Default" />
       <updated>1489957518103</updated>
     </task>
-    <task id="LOCAL-00042" summary="small fixes">
-      <created>1490030423072</created>
-      <option name="number" value="00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1490030423072</updated>
-    </task>
     <task id="LOCAL-00043" summary="small fixes">
       <created>1490031049314</created>
       <option name="number" value="00043" />
@@ -976,28 +999,43 @@
       <option name="project" value="LOCAL" />
       <updated>1490604730392</updated>
     </task>
-    <option name="localTasksCounter" value="91" />
+    <task id="LOCAL-00091" summary="Cleanup">
+      <created>1490605146463</created>
+      <option name="number" value="00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1490605146464</updated>
+    </task>
+    <option name="localTasksCounter" value="92" />
     <servers />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20309168" sideWeight="0.4949785" order="1" side_tool="false" content_ui="combo" x="715" y="162" width="489" height="693" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32792208" sideWeight="0.50479746" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32792208" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1391258" sideWeight="0.4949785" order="1" side_tool="false" content_ui="combo" x="715" y="162" width="489" height="693" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32756758" sideWeight="0.50479746" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32467532" sideWeight="0.5021322" order="11" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995737" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3181818" sideWeight="0.49573562" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31709957" sideWeight="0.49573562" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32467532" sideWeight="0.4978678" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15245202" sideWeight="0.5050215" order="2" side_tool="false" content_ui="tabs" x="93" y="168" width="643" height="697" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32629356" sideWeight="0.4978678" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.32995737" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32792208" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39783785" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.47619048" sideWeight="0.47974414" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3073593" sideWeight="0.47974414" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15831557" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32467532" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1023,7 +1061,8 @@
     <MESSAGE value="small fixes&#10;" />
     <MESSAGE value="DO NOT USE THIS UPDATE" />
     <MESSAGE value="LongPoolHistory branch" />
-    <option name="LAST_COMMIT_MESSAGE" value="LongPoolHistory branch" />
+    <MESSAGE value="Cleanup" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleanup" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1035,69 +1074,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/PIL_module_np.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="176" column="0" selection-start-line="176" selection-start-column="0" selection-end-line="176" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://E:/OpenCV/OpenCV3/opencv/sources/samples/python/edge.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.22743683">
-          <caret line="21" column="17" selection-start-line="21" selection-start-column="17" selection-end-line="21" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://E:/OpenCV/OpenCV3/opencv/sources/samples/python/dft.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.1353791">
-          <caret line="27" column="40" selection-start-line="27" selection-start-column="40" selection-end-line="27" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://E:/OpenCV/OpenCV3/opencv/sources/samples/python/deconvolution.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.45306858">
-          <caret line="55" column="20" selection-start-line="55" selection-start-column="20" selection-end-line="55" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/Program Files/Py35/Lib/site-packages/rdflib/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/libs/AIML_module.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/libs/VK_foaf.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="6" column="40" selection-start-line="5" selection-start-column="11" selection-end-line="5" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Codetest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="24" column="50" selection-start-line="24" selection-start-column="12" selection-end-line="24" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/libs/filters.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/Program Files/Py35/Lib/site-packages/requests/sessions.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.36206895">
@@ -1236,7 +1212,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.03803132">
           <caret line="113" column="108" selection-start-line="113" selection-start-column="108" selection-end-line="113" selection-end-column="108" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1255,13 +1230,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/modules/Currency.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6482412">
-          <caret line="87" column="51" selection-start-line="87" selection-start-column="51" selection-end-line="87" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/modules/Permissions.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.085427135">
@@ -1273,9 +1241,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.37018424">
           <caret line="13" column="8" selection-start-line="13" selection-start-column="8" selection-end-line="13" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#14#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1283,66 +1248,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="263" column="19" selection-start-line="263" selection-start-column="19" selection-end-line="263" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/modules/OpenCV.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="121" column="39" selection-start-line="121" selection-start-column="39" selection-end-line="121" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/modules/PIL_commands.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="31" column="25" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="25" />
-          <folding>
-            <element signature="e#0#9#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Module_Manager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="159" column="49" selection-start-line="159" selection-start-column="49" selection-end-line="159" selection-end-column="49" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DataTypes/res.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.36480686">
-          <caret line="15" column="4" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/User_Manager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="32" column="20" selection-start-line="32" selection-start-column="20" selection-end-line="32" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/modules/CommandModule.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="937" column="61" selection-start-line="937" selection-start-column="61" selection-end-line="937" selection-end-column="61" />
-          <folding>
-            <marker date="1490605012803" expanded="true" signature="0:242" placeholder="import ..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DataTypes/Attachments.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="44" column="36" selection-start-line="44" selection-start-column="36" selection-end-line="44" selection-end-column="36" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1350,14 +1255,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.3411371">
           <caret line="18" column="6" selection-start-line="18" selection-start-column="6" selection-end-line="18" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Users.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="140" column="6" selection-start-line="140" selection-start-column="6" selection-end-line="140" selection-end-column="6" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1373,22 +1270,183 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.33333334">
           <caret line="168" column="4" selection-start-line="168" selection-start-column="4" selection-end-line="168" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Serialiser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.32329988">
+          <caret line="53" column="23" selection-start-line="53" selection-start-column="23" selection-end-line="53" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#9#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataTypes/doc.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="18" column="25" selection-start-line="18" selection-start-column="25" selection-end-line="18" selection-end-column="25" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/User_Manager.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="200" column="32" selection-start-line="200" selection-start-column="32" selection-end-line="200" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Module_Manager.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="32" column="0" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataTypes/user.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-1.2777778">
+          <caret line="16" column="20" selection-start-line="16" selection-start-column="20" selection-end-line="16" selection-end-column="20" />
+          <folding>
+            <element signature="e#0#31#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataTypes/last_seen.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.16666667">
+          <caret line="6" column="23" selection-start-line="6" selection-start-column="23" selection-end-line="6" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataTypes/crop_photo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3888889">
+          <caret line="14" column="18" selection-start-line="14" selection-start-column="18" selection-end-line="14" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataTypes/country.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.44444445">
+          <caret line="16" column="84" selection-start-line="16" selection-start-column="12" selection-end-line="16" selection-end-column="84" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataTypes/counters.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6944444">
+          <caret line="25" column="84" selection-start-line="25" selection-start-column="84" selection-end-line="25" selection-end-column="84" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataTypes/contacts.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3888889">
+          <caret line="14" column="84" selection-start-line="14" selection-start-column="84" selection-end-line="14" selection-end-column="84" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataTypes/career.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.2777778">
+          <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="14" selection-end-column="63" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataTypes/city.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33333334">
+          <caret line="12" column="18" selection-start-line="12" selection-start-column="18" selection-end-line="12" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataTypes/res.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.38958707">
+          <caret line="48" column="5" selection-start-line="48" selection-start-column="5" selection-end-line="48" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Users.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.1220826">
+          <caret line="920" column="23" selection-start-line="920" selection-start-column="13" selection-end-line="920" selection-end-column="23" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/DataTypes/LongPoolUpdate.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="211" column="37" selection-start-line="211" selection-start-column="37" selection-end-line="211" selection-end-column="37" />
-          <folding />
+          <caret line="133" column="31" selection-start-line="133" selection-start-column="31" selection-end-line="133" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#44#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modules/CommandModule.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3611111">
+          <caret line="916" column="85" selection-start-line="916" selection-start-column="85" selection-end-line="916" selection-end-column="85" />
+          <folding>
+            <marker date="1490688420141" expanded="true" signature="0:242" placeholder="import ..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataTypes/attachments.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="21" column="22" selection-start-line="21" selection-start-column="22" selection-end-line="21" selection-end-column="22" />
+          <folding>
+            <element signature="e#0#33#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Vk_bot2.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="432" column="0" selection-start-line="432" selection-start-column="0" selection-end-line="432" selection-end-column="0" />
+          <caret line="411" column="39" selection-start-line="411" selection-start-column="39" selection-end-line="411" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modules/PIL_commands.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.6388889">
+          <caret line="44" column="28" selection-start-line="44" selection-start-column="28" selection-end-line="44" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modules/OpenCV.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.0555556">
+          <caret line="43" column="27" selection-start-line="43" selection-start-column="27" selection-end-line="43" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modules/Currency.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="87" column="51" selection-start-line="87" selection-start-column="51" selection-end-line="87" selection-end-column="51" />
           <folding />
         </state>
       </provider>
@@ -1396,20 +1454,18 @@
     <entry file="file://$PROJECT_DIR$/modules/ImageEdits.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="387" column="12" selection-start-line="387" selection-start-column="12" selection-end-line="387" selection-end-column="12" />
+          <caret line="351" column="44" selection-start-line="351" selection-start-column="38" selection-end-line="351" selection-end-column="44" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Serialiser.py">
+    <entry file="file://$PROJECT_DIR$/DataTypes/photo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.29799107">
-          <caret line="53" column="23" selection-start-line="53" selection-start-column="23" selection-end-line="53" selection-end-column="23" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="0.43589744">
+          <caret line="23" column="21" selection-start-line="23" selection-start-column="21" selection-end-line="23" selection-end-column="21" />
+          <folding />
         </state>
       </provider>
     </entry>

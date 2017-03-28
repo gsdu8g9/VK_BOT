@@ -2,6 +2,7 @@ import os
 import urllib
 from urllib.request import urlopen
 
+from DataTypes.attachments import attachment
 from libs.PIL_module import Glitch, GlitchGif, MakeGlitchGifVSH, MakeGlitchGif
 from libs.tempfile_ import TempFile
 
@@ -28,7 +29,6 @@ class Command_Glitch_(C_template):
     @staticmethod
     def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
         args = {"peer_id": data.chat_id, "v": "5.60", "forward_messages": data.id}
-        print(data.custom)
         sigma = int(data.custom['sigma']) if 'sigma' in data.custom else 5
         iter = int(data.custom['iter']) if 'iter' in data.custom else 150
         size = int(data.custom['size']) if 'size' in data.custom else 32
@@ -40,10 +40,9 @@ class Command_Glitch_(C_template):
         for att in atts:
             try:
 
-                photo = att.photo.photo
+                photo = att.photo._getbiggest()
             except:
                 return False
-            print(photo)
             req = urllib.request.Request(photo, headers=HDR)
             img = urlopen(req).read()
             Tmp = TempFile(img, 'jpg')
