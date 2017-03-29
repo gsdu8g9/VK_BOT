@@ -27,6 +27,8 @@ class attachment:
         self.wall_reply = None
         self.sticker = None
         self.gift = None
+    def GetOwnerAndId(self,type) ->(int,int,str):
+        return vars(self)[type].owner_id,vars(self)[type].id, vars(self)[type].access_key if 'access_key' in vars(vars(self)[type]) else None
 
     def __str__(self):
         return str(dict({var: str(vars(self)[var]) for var in vars(self)}))

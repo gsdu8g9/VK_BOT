@@ -1,10 +1,18 @@
 import time
-
+from DataTypes.LongPoolUpdate import LongPoolMessage
 class Trigger:
     def __init__(self,cond,callback,onetime = True,timeout = 20,infinite = False,*callbackArgs,**callbackKwArgs):
+
         """
-        :param cond: bool function
-        :param callback: callback function
+
+        Args:
+            cond (lambda): takes only one param - LongPoolMessage
+            callback (function): callback function. Will get all Args and Kwargs
+            onetime (bool): is this trigger onetime use?
+            timeout (int): timeout in seconds
+            infinite (bool): is this trigger infinite? don't affected by onetime and timeout
+            *callbackArgs:
+            **callbackKwArgs:
         """
         self.cond = cond
         self.callback = callback
@@ -19,16 +27,23 @@ class TriggerHandler:
         self.triggers = []
 
     def addTrigger(self,*trigger:Trigger):
+
         """
-        :param trigger: Trigger class instance
+
+        Args:
+            *trigger (Trigger):
         """
+        print('Trigger registered!')
         self.triggers.extend(trigger)
 
     def processTriggers(self,data):
+        """
+
+        Args:
+            data (LongPoolMessage):
+        """
         for trigger in self.triggers:
             try:
-                print(data,trigger.cond(data))
-                print(time.time()-trigger.timestart)
                 if time.time()-trigger.timestart > trigger.timeout:
                     self.triggers.remove(trigger)
                     trigger.callback(data,result = False)

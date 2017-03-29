@@ -109,7 +109,7 @@ class Command_Filter(C_template):
             args['message'] += "{}. {}\n".format(filter_ + 1, Fname)
         bot.Replyqueue.put(args)
         print(data.user_id,data.chat_id)
-        t = Trigger(cond = lambda Tdata:Tdata.user_id == data.user_id and Tdata.chat_id == data.chat_id and Tdata['message'].isnumeric(),callback=Command_Filter.Render,Tmp = Tmp,bot = bot,args = args, FArr = FArr)
+        t = Trigger(cond = lambda Tdata:Tdata.user_id == data.user_id and Tdata.chat_id == data.chat_id and Tdata.body.isnumeric(),callback=Command_Filter.Render,Tmp = Tmp,bot = bot,args = args, FArr = FArr)
         bot.TRIGGERS.addTrigger(t)
 
     @staticmethod

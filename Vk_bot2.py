@@ -333,6 +333,7 @@ class Bot:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 TB = traceback.format_tb(exc_traceback)
                 print(exc_type, exc_value, ''.join(TB))
+                return None
 
         return photo['id']
 
@@ -405,7 +406,7 @@ class Bot:
                                 fwdMessages.append(
                                     templateFWD.format('    ' * fwd.depth, Tusr, ' ' + '    ' * fwd.depth, Tmsg))
                         except:
-                            fwdMessages.append('ERROR')
+                            fwdMessages.append(templateFWD.format(' ','ERROR','','ERROR'))
                             continue
 
                 process_FWD(_data.fwd_messages)
@@ -707,8 +708,14 @@ class Bot:
         # print('\n', '\n'.join([str(m) for m in updates.messages]))
         self.Checkqueue.put(updates)
 
-
+    def LeaveMeAlone(self,message:LongPoolMessage,result):
+        defargs = {"peer_id": message.chat_id, "v": "5.60", "forward_messages": message.id}
+        defargs['message'] = 'Оставьте меня. Мне нужно успокоится'
+        print(message)
+        #self.Replyqueue.put(defargs)
 if __name__ == "__main__":
     bot = Bot(DEBUG=True)
+    #t = trigger.Trigger(lambda message: message.body.lower().startswith('ред ') or message.body.lower().startswith('ред,'),callback=bot.LeaveMeAlone,onetime=False,infinite=True)
+    #bot.TRIGGERS.addTrigger(t)
     bot.ContiniousMessageCheck()
 

@@ -12,11 +12,12 @@ class counters:
         self.user_videos = 0
         self.followers = 0
         self.pages = 0
+        self.topics = 0
 
     def __str__(self):
         return str(dict({var: str(vars(self)[var]) for var in vars(self)}))
 
-    def AsDict(self):
+    def AsDict(self) -> dict:
             return {var: vars(self)[var] for var in vars(self)}
     @staticmethod
     def Fill(data):
