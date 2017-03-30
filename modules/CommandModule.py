@@ -10,6 +10,8 @@ from math import log
 from time import sleep
 from urllib.request import urlopen
 
+from DataTypes.group import group,contacts_group
+from utils import ArgBuilder
 try:
     import execjs
 
@@ -34,7 +36,7 @@ import pymorphy2
 import requests
 from libs import VK_foaf
 from libs.tempfile_ import TempFile
-
+from DataTypes.contacts import contacts
 try:
     from .__Command_template import *
 except:
@@ -956,3 +958,30 @@ class Command_Zashkvar(C_template):
         else:
             args['message'] = "Нечего мерять. Прикрепи к команде сообшение зашкварность которого хочешь померять"
             bot.Replyqueue.put(args)
+class Command_GetGroup(C_template):
+    name = ['группа','groupinfo']
+    access = ['user']
+    perm = 'text.groupinfo'
+    template = '{botname}, группа'
+
+    @staticmethod
+    def execute(bot:Vk_bot2.Bot, data:LongPoolMessage,Updates:Updates, forward=True):
+        args = ArgBuilder.Args_message()
+        args.peer_id = data.chat_id
+        g = group.Fill(bot.UserApi.groups.getById(v = '5.60',group_id = data.args[0],fields =['city', 'country', 'place', 'description', 'wiki_page', 'members_count', 'counters', 'start_date', 'finish_date', 'can_post', 'can_see_all_posts', 'activity', 'status', 'contacts', 'links', 'fixed_post', 'verified', 'site', 'ban_info', 'cover'])[0]) #type: group
+        ContactTemplate = "{} {} - {}. {}"
+        GroupTemplate = 'Группа {}\n' \
+                        'Кол-во участников {}\n' \
+                        'Описание : {}\n'
+        contacts = [] # type: list[str]
+        print(g.contacts)
+        for contact in g.contacts: #type:contacts_group
+            print(contact)
+            user = bot.GetUserNameById(contact.user_id)
+
+            contacts.append(ContactTemplate.format(user.first_name,user.last_name,contact.desc,contact.phone if contact.phone!=None else "" ))
+            sleep(0.2)
+        args.message = GroupTemplate.format(g.name,g.members_count,g.description)+'\n'.join(contacts)
+
+
+        bot.Replyqueue.put(args.AsDict_())

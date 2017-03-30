@@ -2,7 +2,6 @@ from DataTypes.city import city
 from DataTypes.country import country
 from DataTypes.counters import counters
 
-
 class ban_info:
     def __init__(self):
         self.end_date = None
@@ -15,8 +14,26 @@ class contacts_group:
         self.desc = None
         self.phone = None
         self.email = None
+    @staticmethod
+    def Fill(data):
+        """
 
-
+        Args:
+            data (dict):
+        Returns:
+            contacts_group
+        """
+        u = contacts_group()
+        vars_ = vars(u)
+        for var in vars_:
+            if (var in data) and (not var.startswith('__')) and not var == 'AsDict':
+                setattr(u,var,data[var])
+        return u
+    # def __str__(self):
+    #     return str(dict({var: str(vars(self)[var]) for var in vars(self) if vars(self)[var] != None}))
+    #
+    # def AsDict(self):
+    #     return {var: vars(self)[var] for var in vars(self) if vars(self)[var] != None}
 class group:
     def __init__(self):
         self.id = None
@@ -43,7 +60,7 @@ class group:
         self.can_upload_doc = None
         self.can_upload_video = None
         self.city = city
-        self.contacts = None
+        self.contacts = contacts_group
         self.city = None
         self.counters = counters
         self.country = country
@@ -56,25 +73,33 @@ class group:
         self.members_count = None
 
     def __str__(self):
-        return str(dict({var: str(vars(self)[var]) for var in vars(self)}))
+        return str(dict({var: str(vars(self)[var]) for var in vars(self) if vars(self)[var] != None}))
 
     def AsDict(self):
-        return {var: vars(self)[var] for var in vars(self)}
+        return {var: vars(self)[var] for var in vars(self) if vars(self)[var] != None}
 
     @staticmethod
     def Fill(data):
-        u = counters()
+        u = group()
         vars_ = vars(u)
         for var in vars_:
-            if (var in data) and (not var.startswith('__')) and not var == 'AsDict':
+            if (var in data) and (not var.startswith('__')):
                 if var == 'counters':
                     setattr(u, var, counters.Fill(data[var]))
-
-                if var == 'country':
+                elif var == 'country':
                     setattr(u, var, country.Fill(data[var]))
+                elif var == 'contacts':
+                    t = []
+                    for cont in data[var]:
+                        t.append(contacts_group.Fill(cont))
 
-                if var == 'city':
+                    setattr(u, var, t)
+
+
+                elif var == 'city':
                     setattr(u, var, city.Fill(data[var]))
+
                 else:
                     setattr(u, var, data[var])
         return u
+

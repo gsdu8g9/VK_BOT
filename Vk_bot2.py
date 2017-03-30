@@ -16,6 +16,7 @@ from vk import *
 import trigger
 from DataTypes.LongPoolUpdate import *
 from DataTypes.user import user
+from DataTypes.group import group
 from Module_Manager import *
 from User_Manager import *
 from libs.AIML_module import Responder
@@ -187,10 +188,11 @@ class Bot:
         Returns:
             user:User data
         """
-
+        print(Id,type_='GetUserNameById/DEBUG')
         if self.USERS.isCached(Id) and case == 'nom' and not update:
             print('Using cached data for user {}'.format(Id))
             User = self.USERS.getCache(str(Id))
+
         else:
             try:
                 User = self.UserApi.users.get(user_ids=Id, v="5.60",fields=['photo_id', 'verified', 'sex', 'bdate', 'city', 'country', 'home_town', 'has_photo', 'photo_50', 'photo_100',
@@ -484,7 +486,7 @@ class Bot:
                                                            'ред', "Ред")
                 Command = str(re.split(pattern, comm[0])[-1])
                 text = copy.deepcopy(Command)
-                message.args = Command.split(' ')
+                message.args = Command.split(' ')[1:]
                 if (message.body.lower().startswith(self.MyName.first_name.lower())) or (
                         message.body.lower().startswith('ред')):
 
@@ -718,4 +720,3 @@ if __name__ == "__main__":
     #t = trigger.Trigger(lambda message: message.body.lower().startswith('ред ') or message.body.lower().startswith('ред,'),callback=bot.LeaveMeAlone,onetime=False,infinite=True)
     #bot.TRIGGERS.addTrigger(t)
     bot.ContiniousMessageCheck()
-
