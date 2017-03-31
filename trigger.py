@@ -1,5 +1,6 @@
 import time
 from DataTypes.LongPoolUpdate import LongPoolMessage
+
 class Trigger:
     def __init__(self,cond,callback,onetime = True,timeout = 20,infinite = False,*callbackArgs,**callbackKwArgs):
 
@@ -22,6 +23,11 @@ class Trigger:
         self.timestart = time.time()
         self.callbackArgs = callbackArgs
         self.callbackKwArgs = callbackKwArgs
+    def __str__(self):
+        return str(dict({var: str(vars(self)[var]) for var in vars(self) if vars(self)[var] != None}))
+
+    def AsDict(self):
+        return {var: vars(self)[var] for var in vars(self) if vars(self)[var] != None}
 class TriggerHandler:
     def __init__(self):
         self.triggers = []
@@ -48,6 +54,7 @@ class TriggerHandler:
                     self.triggers.remove(trigger)
                     trigger.callback(data,result = False)
                 if trigger.cond(data):
+                    print('Triggered, calling callback')
                     trigger.callback(data,result = True,*trigger.callbackArgs,**trigger.callbackKwArgs)
                     if trigger.onetime and not trigger.infinite:
                         self.triggers.remove(trigger)

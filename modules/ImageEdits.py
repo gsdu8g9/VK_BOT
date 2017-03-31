@@ -109,16 +109,16 @@ class Command_Filter(C_template):
             args['message'] += "{}. {}\n".format(filter_ + 1, Fname)
         bot.Replyqueue.put(args)
         print(data.user_id,data.chat_id)
-        t = Trigger(cond = lambda Tdata:Tdata.user_id == data.user_id and Tdata.chat_id == data.chat_id and Tdata.body.isnumeric(),callback=Command_Filter.Render,Tmp = Tmp,bot = bot,args = args, FArr = FArr)
+        t = Trigger(cond = lambda Tdata : Tdata.user_id == data.user_id and Tdata.chat_id == data.chat_id and Tdata.body.isnumeric(),callback=Command_Filter.Render,Tmp = Tmp,bot = bot,args = args, FArr = FArr)
         bot.TRIGGERS.addTrigger(t)
 
     @staticmethod
-    def Render(data,result,Tmp,bot,args,FArr):
+    def Render(data:LongPoolMessage,result,Tmp,bot,args,FArr):
         if result == False:
             Tmp.rem()
             args['message'] = "Время ожидания ответа истекло"
             bot.Replyqueue.put(args)
-        ans = int(data['message'])-1
+        ans = int(data.body)-1
         filter_ = bot.MODULES.FILTERS[FArr[ans]].funk
         print('used filter {}'.format(filter_.name))
         filter_().render(Tmp.path_)

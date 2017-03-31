@@ -19,7 +19,6 @@ from DataTypes.user import user
 from DataTypes.group import group
 from Module_Manager import *
 from User_Manager import *
-from libs.AIML_module import Responder
 from libs.tempfile_ import *
 HDR = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
@@ -86,9 +85,10 @@ class SessionCapchaFix(Session):
 
 class Bot:
     def __init__(self, threads=4, LP_Threads=1, DEBUG=False):
+
         self.ROOT = getpath()
         self.IMAGES = os.path.join(self.ROOT, 'IMAGES')
-        self.Responder = Responder()
+        # self.Responder = Responder()
         self.Checkqueue = queue.Queue()
         self.Replyqueue = queue.Queue()
         self.LP_threads = []
@@ -131,7 +131,7 @@ class Bot:
 
         self.MyUId = self.UserApi.users.get()[0]['uid']
 
-        self.MyName = self.GetUserNameById(self.MyUId,update=True)
+        self.MyName = self.GetUserNameById(self.MyUId, update=True)
 
         print('LOADED')
 
@@ -176,7 +176,7 @@ class Bot:
             s = s.replace(code[1], code[0])
         return s
 
-    def GetUserNameById(self, Id, case='nom',update = False) -> user:
+    def GetUserNameById(self, Id, case='nom', update=False) -> user:
 
         """
 
@@ -188,23 +188,35 @@ class Bot:
         Returns:
             user:User data
         """
-        print(Id,type_='GetUserNameById/DEBUG')
+        print(Id, type_='GetUserNameById/DEBUG')
         if self.USERS.isCached(Id) and case == 'nom' and not update:
             print('Using cached data for user {}'.format(Id))
             User = self.USERS.getCache(str(Id))
 
         else:
             try:
-                User = self.UserApi.users.get(user_ids=Id, v="5.60",fields=['photo_id', 'verified', 'sex', 'bdate', 'city', 'country', 'home_town', 'has_photo', 'photo_50', 'photo_100',
-                                                                             'photo_200_orig', 'photo_200', 'photo_400_orig', 'photo_max', 'photo_max_orig', 'online', 'domain',
-                                                                             'has_mobile', 'contacts', 'site', 'education', 'universities', 'schools', 'status', 'last_seen',
-                                                                             'followers_count', 'common_count', 'occupation', 'nickname', 'relatives', 'relation', 'personal',
-                                                                             'connections', 'exports', 'wall_comments', 'activities', 'interests', 'music', 'movies', 'tv',
-                                                                             'books', 'games', 'about', 'quotes', 'can_post', 'can_see_all_posts', 'can_see_audio', 'can_write_private_message',
-                                                                             'can_send_friend_request', 'is_favorite', 'is_hidden_from_feed', 'timezone', 'screen_name', 'maiden_name',
-                                                                             'crop_photo', 'is_friend', 'friend_status', 'career', 'military', 'blacklisted', 'blacklisted_by_me', 'first_name_nom', 'first_name_gen',
-                                                                             'first_name_dat', 'first_name_acc', 'first_name_ins', 'first_name_abl', 'last_name_nom', 'last_name_gen', 'last_name_dat',
-                                                                             'last_name_acc', 'last_name_ins', 'last_name_abl'])[0]
+                User = self.UserApi.users.get(user_ids=Id, v="5.60",
+                                              fields=['photo_id', 'verified', 'sex', 'bdate', 'city', 'country',
+                                                      'home_town', 'has_photo', 'photo_50', 'photo_100',
+                                                      'photo_200_orig', 'photo_200', 'photo_400_orig', 'photo_max',
+                                                      'photo_max_orig', 'online', 'domain',
+                                                      'has_mobile', 'contacts', 'site', 'education', 'universities',
+                                                      'schools', 'status', 'last_seen',
+                                                      'followers_count', 'common_count', 'occupation', 'nickname',
+                                                      'relatives', 'relation', 'personal',
+                                                      'connections', 'exports', 'wall_comments', 'activities',
+                                                      'interests', 'music', 'movies', 'tv',
+                                                      'books', 'games', 'about', 'quotes', 'can_post',
+                                                      'can_see_all_posts', 'can_see_audio', 'can_write_private_message',
+                                                      'can_send_friend_request', 'is_favorite', 'is_hidden_from_feed',
+                                                      'timezone', 'screen_name', 'maiden_name',
+                                                      'crop_photo', 'is_friend', 'friend_status', 'career', 'military',
+                                                      'blacklisted', 'blacklisted_by_me', 'first_name_nom',
+                                                      'first_name_gen',
+                                                      'first_name_dat', 'first_name_acc', 'first_name_ins',
+                                                      'first_name_abl', 'last_name_nom', 'last_name_gen',
+                                                      'last_name_dat',
+                                                      'last_name_acc', 'last_name_ins', 'last_name_abl'])[0]
                 self.USERS.cacheUser(Id, User)
             except Exception:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -367,7 +379,7 @@ class Bot:
 
     def ExecCommands(self):
 
-        def process_fwd_msg(message: LongPoolMessage) ->LongPoolMessage:
+        def process_fwd_msg(message: LongPoolMessage) -> LongPoolMessage:
             if message.hasFwd:
                 fwd = message.fwd_messages[0]
 
@@ -408,7 +420,7 @@ class Bot:
                                 fwdMessages.append(
                                     templateFWD.format('    ' * fwd.depth, Tusr, ' ' + '    ' * fwd.depth, Tmsg))
                         except:
-                            fwdMessages.append(templateFWD.format(' ','ERROR','','ERROR'))
+                            fwdMessages.append(templateFWD.format(' ', 'ERROR', '', 'ERROR'))
                             continue
 
                 process_FWD(_data.fwd_messages)
@@ -506,13 +518,14 @@ class Bot:
                         if self.USERS.HasPerm(user, funk.perms) and self.MODULES.CanAfford(self.USERS.GetCurrency(user),
                                                                                            Command):
                             try:
-                                print("Trying to execute commnad {},\n arguments:{}".format(Command, message.custom))
+                                print("Trying to execute commnad {},\n arguments:{}".format(Command, message.args))
+                                print(message)
                                 stat = funk.funk.execute(self, message, PvUpdates)
                                 self.USERS.pay(user, funk.cost)
                                 if stat == False:
                                     print(self.MyName)
                                     defargs['message'] = 'Неправильно оформлен запрос. Пример запроса : {}'.format(
-                                        funk.template.format(botname = self.MyName.first_name))
+                                        funk.template.format(botname=self.MyName.first_name))
                                     self.Checkqueue.task_done()
                                     self.Replyqueue.put(defargs)
                                     continue
@@ -688,15 +701,29 @@ class Bot:
 
     def parseLongPoolHistory(self, ts):
         resp = self.UserApi.messages.getLongPollHistory(ts=ts, v='5.63',
-                                                        fields=['photo_id', 'verified', 'sex', 'bdate', 'city', 'country', 'home_town', 'has_photo', 'photo_50', 'photo_100',
-                                                                'photo_200_orig', 'photo_200', 'photo_400_orig', 'photo_max', 'photo_max_orig', 'online', 'domain',
-                                                                'has_mobile', 'contacts', 'site', 'education', 'universities', 'schools', 'status', 'last_seen',
-                                                                'followers_count', 'common_count', 'occupation', 'nickname', 'relatives', 'relation', 'personal',
-                                                                'connections', 'exports', 'wall_comments', 'activities', 'interests', 'music', 'movies', 'tv',
-                                                                'books', 'games', 'about', 'quotes', 'can_post', 'can_see_all_posts', 'can_see_audio', 'can_write_private_message',
-                                                                'can_send_friend_request', 'is_favorite', 'is_hidden_from_feed', 'timezone', 'screen_name', 'maiden_name',
-                                                                'crop_photo', 'is_friend', 'friend_status', 'career', 'military', 'blacklisted', 'blacklisted_by_me', 'first_name_nom', 'first_name_gen',
-                                                                'first_name_dat', 'first_name_acc', 'first_name_ins', 'first_name_abl', 'last_name_nom', 'last_name_gen', 'last_name_dat',
+                                                        fields=['photo_id', 'verified', 'sex', 'bdate', 'city',
+                                                                'country', 'home_town', 'has_photo', 'photo_50',
+                                                                'photo_100',
+                                                                'photo_200_orig', 'photo_200', 'photo_400_orig',
+                                                                'photo_max', 'photo_max_orig', 'online', 'domain',
+                                                                'has_mobile', 'contacts', 'site', 'education',
+                                                                'universities', 'schools', 'status', 'last_seen',
+                                                                'followers_count', 'common_count', 'occupation',
+                                                                'nickname', 'relatives', 'relation', 'personal',
+                                                                'connections', 'exports', 'wall_comments', 'activities',
+                                                                'interests', 'music', 'movies', 'tv',
+                                                                'books', 'games', 'about', 'quotes', 'can_post',
+                                                                'can_see_all_posts', 'can_see_audio',
+                                                                'can_write_private_message',
+                                                                'can_send_friend_request', 'is_favorite',
+                                                                'is_hidden_from_feed', 'timezone', 'screen_name',
+                                                                'maiden_name',
+                                                                'crop_photo', 'is_friend', 'friend_status', 'career',
+                                                                'military', 'blacklisted', 'blacklisted_by_me',
+                                                                'first_name_nom', 'first_name_gen',
+                                                                'first_name_dat', 'first_name_acc', 'first_name_ins',
+                                                                'first_name_abl', 'last_name_nom', 'last_name_gen',
+                                                                'last_name_dat',
                                                                 'last_name_acc', 'last_name_ins', 'last_name_abl'], )
         try:
             updates = FillUpdates(resp)
@@ -710,13 +737,16 @@ class Bot:
         # print('\n', '\n'.join([str(m) for m in updates.messages]))
         self.Checkqueue.put(updates)
 
-    def LeaveMeAlone(self,message:LongPoolMessage,result):
+    def LeaveMeAlone(self, message: LongPoolMessage, result):
         defargs = {"peer_id": message.chat_id, "v": "5.60", "forward_messages": message.id}
         defargs['message'] = 'Оставьте меня. Мне нужно успокоится'
         print(message)
-        #self.Replyqueue.put(defargs)
+        # self.Replyqueue.put(defargs)
+
+
 if __name__ == "__main__":
     bot = Bot(DEBUG=True)
-    #t = trigger.Trigger(lambda message: message.body.lower().startswith('ред ') or message.body.lower().startswith('ред,'),callback=bot.LeaveMeAlone,onetime=False,infinite=True)
+    #t = trigger.Trigger(lambda message: (message.chat_id == 2000000025) and (message.user_id == 208128019),
+    #                    callback=bot.LeaveMeAlone, onetime=False, infinite=True)
     #bot.TRIGGERS.addTrigger(t)
     bot.ContiniousMessageCheck()

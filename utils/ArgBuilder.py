@@ -12,6 +12,7 @@ class Args_message(Args_def):
         self.peer_id = None
         self.message = ''
         self.attachment = []
+        self.forward_messages = []  # type: list[int]
 
     def AddAttachment(self, *attachments: attachment):
         template = '{}{}_{}'

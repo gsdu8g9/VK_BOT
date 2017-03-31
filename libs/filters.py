@@ -13,7 +13,7 @@ from multiprocessing.pool import ThreadPool
 import cv2
 import numpy as np
 from PIL import Image, ImageOps, ImageChops
-from scipy.interpolate import UnivariateSpline
+# from scipy.interpolate import UnivariateSpline
 
 xrange = range
 
@@ -62,90 +62,90 @@ class PencilSketch:
         # return
 
 
-class WarmingFilter:
-    """Warming filter
-
-        A class that applies a warming filter to an image.
-        The class uses curve filters to manipulate the perceived color
-        temparature of an image. The warming filter will shift the image's
-        color spectrum towards red, away from blue.
-    """
-
-    def __init__(self):
-        """Initialize look-up table for curve filter"""
-        # create look-up tables for increasing and decreasing a channel
-        self.incr_ch_lut = self._create_LUT_8UC1([0, 64, 128, 192, 256],
-                                                 [0, 70, 140, 210, 256])
-        self.decr_ch_lut = self._create_LUT_8UC1([0, 64, 128, 192, 256],
-                                                 [0, 30, 80, 120, 192])
-
-    def render(self, img_rgb):
-        """Applies warming filter to an RGB image
-
-            :param img_rgb: RGB image to be processed
-            :returns: Processed RGB image
-        """
-        path = img_rgb
-        img_rgb = cv2.imread(img_rgb)
-        # warming filter: increase red, decrease blue
-        c_r, c_g, c_b = cv2.split(img_rgb)
-        c_r = cv2.LUT(c_r, self.incr_ch_lut).astype(np.uint8)
-        c_b = cv2.LUT(c_b, self.decr_ch_lut).astype(np.uint8)
-        img_rgb = cv2.merge((c_r, c_g, c_b))
-
-        # increase color saturation
-        c_h, c_s, c_v = cv2.split(cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV))
-        c_s = cv2.LUT(c_s, self.incr_ch_lut).astype(np.uint8)
-        cv2.imwrite(path, cv2.cvtColor(cv2.merge((c_h, c_s, c_v)), cv2.COLOR_HSV2RGB))
-        # return cv2.cvtColor(cv2.merge((c_h, c_s, c_v)), cv2.COLOR_HSV2RGB)
-
-    def _create_LUT_8UC1(self, x, y):
-        """Creates a look-up table using scipy's spline interpolation"""
-        spl = UnivariateSpline(x, y)
-        return spl(xrange(256))
-
-
-class CoolingFilter:
-    """Cooling filter
-
-        A class that applies a cooling filter to an image.
-        The class uses curve filters to manipulate the perceived color
-        temparature of an image. The warming filter will shift the image's
-        color spectrum towards blue, away from red.
-    """
-
-    def __init__(self):
-        """Initialize look-up table for curve filter"""
-        # create look-up tables for increasing and decreasing a channel
-        self.incr_ch_lut = self._create_LUT_8UC1([0, 64, 128, 192, 256],
-                                                 [0, 70, 140, 210, 256])
-        self.decr_ch_lut = self._create_LUT_8UC1([0, 64, 128, 192, 256],
-                                                 [0, 30, 80, 120, 192])
-
-    def render(self, img_rgb):
-        """Applies pencil sketch effect to an RGB image
-
-            :param img_rgb: RGB image to be processed
-            :returns: Processed RGB image
-        """
-        path = img_rgb
-        img_rgb = cv2.imread(img_rgb)
-        # cooling filter: increase blue, decrease red
-        c_r, c_g, c_b = cv2.split(img_rgb)
-        c_r = cv2.LUT(c_r, self.decr_ch_lut).astype(np.uint8)
-        c_b = cv2.LUT(c_b, self.incr_ch_lut).astype(np.uint8)
-        img_rgb = cv2.merge((c_r, c_g, c_b))
-
-        # decrease color saturation
-        c_h, c_s, c_v = cv2.split(cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV))
-        c_s = cv2.LUT(c_s, self.decr_ch_lut).astype(np.uint8)
-        cv2.imwrite(path, cv2.cvtColor(cv2.merge((c_h, c_s, c_v)), cv2.COLOR_HSV2RGB))
-        # return cv2.cvtColor(cv2.merge((c_h, c_s, c_v)), cv2.COLOR_HSV2RGB)
-
-    def _create_LUT_8UC1(self, x, y):
-        """Creates a look-up table using scipy's spline interpolation"""
-        spl = UnivariateSpline(x, y)
-        return spl(xrange(256))
+# class WarmingFilter:
+#     """Warming filter
+#
+#         A class that applies a warming filter to an image.
+#         The class uses curve filters to manipulate the perceived color
+#         temparature of an image. The warming filter will shift the image's
+#         color spectrum towards red, away from blue.
+#     """
+#
+#     def __init__(self):
+#         """Initialize look-up table for curve filter"""
+#         # create look-up tables for increasing and decreasing a channel
+#         self.incr_ch_lut = self._create_LUT_8UC1([0, 64, 128, 192, 256],
+#                                                  [0, 70, 140, 210, 256])
+#         self.decr_ch_lut = self._create_LUT_8UC1([0, 64, 128, 192, 256],
+#                                                  [0, 30, 80, 120, 192])
+#
+#     def render(self, img_rgb):
+#         """Applies warming filter to an RGB image
+#
+#             :param img_rgb: RGB image to be processed
+#             :returns: Processed RGB image
+#         """
+#         path = img_rgb
+#         img_rgb = cv2.imread(img_rgb)
+#         # warming filter: increase red, decrease blue
+#         c_r, c_g, c_b = cv2.split(img_rgb)
+#         c_r = cv2.LUT(c_r, self.incr_ch_lut).astype(np.uint8)
+#         c_b = cv2.LUT(c_b, self.decr_ch_lut).astype(np.uint8)
+#         img_rgb = cv2.merge((c_r, c_g, c_b))
+#
+#         # increase color saturation
+#         c_h, c_s, c_v = cv2.split(cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV))
+#         c_s = cv2.LUT(c_s, self.incr_ch_lut).astype(np.uint8)
+#         cv2.imwrite(path, cv2.cvtColor(cv2.merge((c_h, c_s, c_v)), cv2.COLOR_HSV2RGB))
+#         # return cv2.cvtColor(cv2.merge((c_h, c_s, c_v)), cv2.COLOR_HSV2RGB)
+#
+#     def _create_LUT_8UC1(self, x, y):
+#         """Creates a look-up table using scipy's spline interpolation"""
+#         spl = UnivariateSpline(x, y)
+#         return spl(xrange(256))
+#
+#
+# class CoolingFilter:
+#     """Cooling filter
+#
+#         A class that applies a cooling filter to an image.
+#         The class uses curve filters to manipulate the perceived color
+#         temparature of an image. The warming filter will shift the image's
+#         color spectrum towards blue, away from red.
+#     """
+#
+#     def __init__(self):
+#         """Initialize look-up table for curve filter"""
+#         # create look-up tables for increasing and decreasing a channel
+#         self.incr_ch_lut = self._create_LUT_8UC1([0, 64, 128, 192, 256],
+#                                                  [0, 70, 140, 210, 256])
+#         self.decr_ch_lut = self._create_LUT_8UC1([0, 64, 128, 192, 256],
+#                                                  [0, 30, 80, 120, 192])
+#
+#     def render(self, img_rgb):
+#         """Applies pencil sketch effect to an RGB image
+#
+#             :param img_rgb: RGB image to be processed
+#             :returns: Processed RGB image
+#         """
+#         path = img_rgb
+#         img_rgb = cv2.imread(img_rgb)
+#         # cooling filter: increase blue, decrease red
+#         c_r, c_g, c_b = cv2.split(img_rgb)
+#         c_r = cv2.LUT(c_r, self.decr_ch_lut).astype(np.uint8)
+#         c_b = cv2.LUT(c_b, self.incr_ch_lut).astype(np.uint8)
+#         img_rgb = cv2.merge((c_r, c_g, c_b))
+#
+#         # decrease color saturation
+#         c_h, c_s, c_v = cv2.split(cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV))
+#         c_s = cv2.LUT(c_s, self.decr_ch_lut).astype(np.uint8)
+#         cv2.imwrite(path, cv2.cvtColor(cv2.merge((c_h, c_s, c_v)), cv2.COLOR_HSV2RGB))
+#         # return cv2.cvtColor(cv2.merge((c_h, c_s, c_v)), cv2.COLOR_HSV2RGB)
+#
+#     def _create_LUT_8UC1(self, x, y):
+#         """Creates a look-up table using scipy's spline interpolation"""
+#         spl = UnivariateSpline(x, y)
+#         return spl(xrange(256))
 
 
 class Cartoonizer:
